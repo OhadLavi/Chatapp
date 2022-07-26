@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="purple_200">#FFBB86FC</color>
+    <color name="purple_500">#FF6200EE</color>
+    <color name="purple_700">#FF3700B3</color>
+    <color name="teal_200">#FF03DAC5</color>
+    <color name="teal_700">#FF018786</color>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="gray">#535050</color>
+    <color name ="lightGray">#BABABA</color>
+    <color name="chatBubble">#1d282f</color>
+    <color name="chatText">#63737c</color>
+    <color name="menu">#1d282f</color>
+    <color name="menuText">#63737c</color>
+    <color name="colorPrimary">#114c9e</color>
+    <color name="test">#052147</color>
+    <color name="primary_dark">#1d282f</color>
+    <color name="app_background">#1b202d</color>
+    <color name="textLikeBackground">#212529</color>
+    <color name="primary_text">#63737c</color>
+    <color name="text_color_primary">#63737c</color>
+    <color name="secondary_text">#FFFFFFFF</color>
+    <color name="input_color">#e0e0e0</color>
+    <color name="error">#630606</color>
+    <color name="imagePicker">#2978A5</color>
+    <color name="buttonColor">#2978A5</color>
+    <color name="chatBackground">#292f3f</color>
+    <color name="toolbarBackground">#292f3f</color>
+    <color name="chatDate">#a8aebe</color>
+    <color name="updatePhotoIcon">#a8aebe</color>
+    <color name="chatMessage">#a8aebe</color>
+    <color name="editProfileImageColor">#a8aebe</color>
+    <color name="chatSearch">#292f3f</color>
+    <color name="chatMessageInput">#3d4354</color>
+    <color name="chatMessageTextColor">#9498a1</color>
+    <color name="rightBubbleBackground">#7a8194</color>
+    <color name="leftBubbleBackground">#373e4e</color>
+</resources>

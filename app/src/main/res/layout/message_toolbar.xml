@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+        <variable
+            name="image"
+            type="String" />
+        <variable
+            name="activity"
+            type="com.example.Dashboard" />
+        <variable
+            name="status"
+            type="String" />
+    </data>
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/msgToolbar"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:background="@drawable/chat_toolbar">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <androidx.coordinatorlayout.widget.CoordinatorLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginStart="0dp">
+
+                <ImageView
+                    android:id="@+id/msgBack"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_centerVertical="true"
+                    android:onClick="previousButton"
+                    android:src="@drawable/ic_back"
+                    app:tint="@color/white" />
+
+            </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+
+            <androidx.coordinatorlayout.widget.CoordinatorLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="25dp">
+
+                <de.hdodenhof.circleimageview.CircleImageView
+                    android:id="@+id/freindImage"
+                    android:layout_width="47dp"
+                    android:layout_height="47dp"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginEnd="5dp"
+                    android:layout_marginBottom="5dp"
+                    app:imageUrl="@{image}" />
+
+                <ImageView
+                    android:id="@+id/msgOnlineStatus"
+                    android:layout_width="10dp"
+                    android:layout_height="10dp"
+                    android:layout_marginTop="40dp"
+                    android:layout_marginRight="5dp"
+                    android:src="@{status.equals(`online`)? @drawable/ic_online:@drawable/ic_offline}"
+                    app:layout_anchor="@id/freindImage"
+                    app:layout_anchorGravity="end|center" />
+
+                <TextView
+                    android:id="@+id/freindName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="70dp"
+                    android:layout_marginTop="5dp"
+                    android:text="TextView"
+                    android:textColor="@color/white"
+                    android:textSize="18sp" />
+
+                <TextView
+                    android:id="@+id/onlineStatus"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+
+                    android:layout_marginStart="70dp"
+                    android:layout_marginTop="30dp"
+                    android:text="Last seen on" />
+            </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+            <ImageView
+                android:id="@+id/callFriend"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:layout_marginRight="@dimen/_16sdp"
+                android:layout_weight="1"
+                app:srcCompat="@drawable/ic_call" />
+            <!--
+            <ImageView
+                android:id="@+id/msgInfo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:layout_marginEnd="10dp"
+                android:onClick="@{()->activity.userInfo()}"
+                android:src="@drawable/ic_info"
+                app:tint="@color/colorAccent" />-->
+        </RelativeLayout>
+    </androidx.appcompat.widget.Toolbar>
+</layout>

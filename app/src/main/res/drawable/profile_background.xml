@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="@color/chatBackground"/>
+    <padding android:top="12dp" />
+    <corners android:topLeftRadius="25dp"
+        android:topRightRadius="25dp"/>
+</shape>

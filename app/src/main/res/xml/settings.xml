@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    android:background="#212529"
+    android:backgroundTint="#212529">
+
+    <SwitchPreference
+        android:defaultValue="false"
+        android:key="save"
+        android:summaryOff=""
+        android:summaryOn=""
+        android:title="Save deleted countries" />
+    <SwitchPreference
+        android:defaultValue="false"
+        android:key="savingMethod"
+        android:summaryOff=""
+        android:summaryOn=""
+        android:title="Local file saving" />
+</PreferenceScreen>
