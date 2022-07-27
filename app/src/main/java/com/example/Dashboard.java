@@ -39,6 +39,7 @@ public class Dashboard extends AppCompatActivity {
     private UserAdapter userAdapter;
     private List<UserModel> mUsers;
     private String myID;
+    private Utils utils;
     @Override
     public void onBackPressed() { //methode to deal with back button press
         //Toast.makeText(this, "test", Toast.LENGTH_SHORT).show();
@@ -62,7 +63,6 @@ public class Dashboard extends AppCompatActivity {
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(this)); //define recycle view to use linear layout
         mUsers = new ArrayList<>(); //crete an array list of users according the UserModel POJO
-
         SearchView searchView = findViewById(R.id.contactSearchView); //define the search bar on the top of the dashboard view
         SearchView.SearchAutoComplete theTextArea = searchView.findViewById(androidx.appcompat.R.id.search_src_text);
         theTextArea.setTextColor(getResources().getColor(R.color.white));
@@ -71,7 +71,7 @@ public class Dashboard extends AppCompatActivity {
 //        theTextArea.setCursorVisible(true);
         ImageView ivClose = searchView.findViewById(search_close_btn);
         ivClose.setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.white), android.graphics.PorterDuff.Mode.SRC_IN);
-
+        utils = new Utils();
         ReadUsers(); //call ReadUsers methode
     }
 
@@ -130,4 +130,17 @@ public class Dashboard extends AppCompatActivity {
         }
         return true;
     }
+
+    @Override
+    protected void onResume() {
+        utils.updateOnlineStatus("online");
+        super.onResume();
+    }
+
+    @Override
+    protected void onPause() {
+        utils.updateOnlineStatus(String.valueOf(System.currentTimeMillis()));
+        super.onPause();
+    }
+
 }

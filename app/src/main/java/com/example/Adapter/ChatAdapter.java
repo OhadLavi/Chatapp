@@ -63,13 +63,15 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
     public void onBindViewHolder(@NonNull ChatAdapter.ViewHolder holder, int position) {
         ChatModel chat = mChat.get(position);
         holder.showMessage.setText(chat.getMessage());
-        DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd hh-mm-ss a", Locale.FRENCH);
+        DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH-mm-ss", Locale.FRENCH);
         Date date = null;
         try {
-            date = (Date) formatter.parse(chat.getDate().toString());
-        }catch(Exception e) {}
-        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm", Locale.FRENCH);
-        holder.messageDate.setText(sdf.format(date));
+            date = (Date) formatter.parse(chat.getDate());
+            SimpleDateFormat sdf = new SimpleDateFormat("HH:mm", Locale.FRENCH);
+            holder.messageDate.setText(sdf.format(date));
+        } catch(Exception e) {
+            Toast.makeText(context, "Error setting message times", Toast.LENGTH_SHORT).show();
+        }
 
         holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override

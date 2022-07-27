@@ -10,9 +10,16 @@ import android.view.inputmethod.InputMethodManager;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.TimeZone;
 
 public class Utils {
     private static final int SECOND_MILLIS = 1000;
@@ -26,7 +33,13 @@ public class Utils {
     }
     public String currentDate() { //return the date of today in the format sdf as defined below
         Calendar calendar = Calendar.getInstance();
-        return sdf().format(calendar.getTimeInMillis());
+        Date date = calendar.getTime();
+        SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy HH-mm-ss", Locale.FRENCH);
+        df.setTimeZone(TimeZone.getTimeZone("Asia/Jerusalem"));
+        return df.format(date);
+        //return sdf().format(calendar.getTimeInMillis());
+        //calendar.setTimeZone(TimeZone.getTimeZone(timezone));
+
     }
     public static SimpleDateFormat sdf() {
         return new SimpleDateFormat("yyyy-MM-dd hh-mm-ss a", Locale.FRENCH);
@@ -61,5 +74,14 @@ public class Utils {
 
     public void requestStorage(Activity activity) { //request user permission to read data from external storage
         ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE}, 2000);
+    }
+
+    public void updateOnlineStatus(String online) {
+        //if (!online.equals("online"))
+        //    online = getTimeAgo(online);
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Users").child(FirebaseAuth.getInstance().getCurrentUser().getUid());
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("online", online);
+        databaseReference.updateChildren(map);
     }
 }

@@ -136,7 +136,7 @@
                                 android:layout_height="wrap_content"
                                 android:layout_marginLeft="2dp"
                                 android:text="text"
-                                android:textColor="@color/chatDate"
+                                android:textColor="@color/phoneNumberProfile"
                                 android:textSize="15dp"
                                 android:textStyle="bold" />
                         </LinearLayout>
@@ -175,17 +175,14 @@
 
                     <EditText
                         android:id="@+id/profileFirstNameEdit"
+                        style="@style/EditTextStyle"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
+                        android:layout_height="40dp"
                         android:minWidth="@dimen/_150sdp"
                         android:layout_marginStart="21dp"
-                        android:backgroundTint="@color/text_color_primary"
+                        android:backgroundTint="@android:color/transparent"
                         android:inputType="none"
                         android:text="test"
-                        android:textColor="@color/text_color_primary"
-                        android:textColorHighlight="@color/text_color_primary"
-                        android:textColorHint="@color/text_color_primary"
-                        android:textColorLink="@color/text_color_primary"
                         android:textSize="@dimen/_14ssp"
                         android:paddingBottom="10dp" />
 
@@ -221,17 +218,14 @@
 
                     <EditText
                         android:id="@+id/profileLastNameEdit"
+                        style="@style/EditTextStyle"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
+                        android:layout_height="40dp"
                         android:minWidth="@dimen/_150sdp"
                         android:layout_marginStart="21dp"
-                        android:backgroundTint="@color/text_color_primary"
+                        android:backgroundTint="@android:color/transparent"
                         android:inputType="none"
                         android:text="test"
-                        android:textColor="@color/text_color_primary"
-                        android:textColorHighlight="@color/text_color_primary"
-                        android:textColorHint="@color/text_color_primary"
-                        android:textColorLink="@color/text_color_primary"
                         android:textSize="@dimen/_14ssp"
                         android:paddingBottom="10dp" />
 
@@ -249,8 +243,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:background="@color/chatBackground"
-                    android:orientation="vertical"
-                    >
+                    android:orientation="vertical">
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -271,17 +264,14 @@
 
                         <EditText
                             android:id="@+id/profileStatusEdit"
+                            style="@style/EditTextStyle"
                             android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:minWidth="@dimen/_150sdp"
+                            android:layout_height="40dp"
                             android:layout_marginStart="21dp"
-                            android:backgroundTint="@color/text_color_primary"
+                            android:backgroundTint="@android:color/transparent"
                             android:inputType="none"
+                            android:minWidth="@dimen/_150sdp"
                             android:text="test"
-                            android:textColor="@color/text_color_primary"
-                            android:textColorHighlight="@color/text_color_primary"
-                            android:textColorHint="@color/text_color_primary"
-                            android:textColorLink="@color/text_color_primary"
                             android:textSize="@dimen/_14ssp" />
 
                     </LinearLayout>

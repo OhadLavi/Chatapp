@@ -25,6 +25,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.example.Dashboard;
+import com.example.ForegroundService;
 import com.example.Utils;
 import com.example.project3.R;
 import com.example.project3.databinding.FragmentUserDataBinding;
@@ -165,6 +166,8 @@ public class UserData extends Fragment {
                                 editor.putString("username", firstName + " " + lastName).apply(); //save user's first and last name in Shared Preferences
                                 editor.putString("userImage", url).apply(); //save user's image url in Shared Preferences
                                 Intent intent = new Intent(getContext(), Dashboard.class); //crate and start new intent with the dashboard
+                                Intent serviceIntent = new Intent(getActivity(), ForegroundService.class);
+                                ContextCompat.startForegroundService(getContext(), serviceIntent);
                                 startActivity(intent);
                                 getActivity().finish(); //finish current fragment
                             } else

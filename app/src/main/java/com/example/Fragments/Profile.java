@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.InputType;
@@ -17,6 +19,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import com.example.Adapter.UserAdapter;
@@ -54,6 +57,8 @@ public class Profile extends Fragment {
     private FirebaseAuth firebaseAuth;
     private Utils utils;
     private Uri imageUri;
+    private SharedPreferences sharedPreferences;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -75,6 +80,7 @@ public class Profile extends Fragment {
         storageReference = FirebaseStorage.getInstance().getReference();
         utils = new Utils();
         storagePath = firebaseAuth.getUid() + "Media/Profile_Image/profile"; //get user profile image path
+        sharedPreferences = getContext().getSharedPreferences("UserData", Context.MODE_PRIVATE);
         if(getActivity().findViewById(R.id.card) != null)
             getActivity().findViewById(R.id.card).setVisibility(View.GONE);
         profileName = view.findViewById(R.id.profileName);
@@ -104,7 +110,12 @@ public class Profile extends Fragment {
                 profileFirstNameEditText.setInputType(InputType.TYPE_CLASS_TEXT);
                 profileLastNameEditText.setInputType(InputType.TYPE_CLASS_TEXT);
                 profileStatusEditText.setInputType(InputType.TYPE_CLASS_TEXT);
-
+                profileFirstNameEditText.getBackground().setColorFilter(ContextCompat.getColor(getContext(), R.color.black), PorterDuff.Mode.SRC_IN);
+                profileLastNameEditText.getBackground().setColorFilter(ContextCompat.getColor(getContext(), R.color.black), PorterDuff.Mode.SRC_IN);
+                profileStatusEditText.getBackground().setColorFilter(ContextCompat.getColor(getContext(), R.color.black), PorterDuff.Mode.SRC_IN);
+                profileFirstNameEditText.setTextAppearance(R.style.EditTextStyleEdited);
+                profileLastNameEditText.setTextAppearance(R.style.EditTextStyleEdited);
+                profileStatusEditText.setTextAppearance(R.style.EditTextStyleEdited);
                 uploadPhoto.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
@@ -126,21 +137,33 @@ public class Profile extends Fragment {
                 profileFirstNameEditText.setInputType(InputType.TYPE_NULL);
                 profileLastNameEditText.setInputType(InputType.TYPE_NULL);
                 profileStatusEditText.setInputType(InputType.TYPE_NULL);
-                if (checkImage()) {
-                    storageReference.child(storagePath).putFile(imageUri).addOnSuccessListener(taskSnapshot -> { //upload user image to fire base and receive URL to access it
-                        Task<Uri> task = taskSnapshot.getStorage().getDownloadUrl();
-                        task.addOnCompleteListener(new OnCompleteListener<Uri>() { //listener for image URL received successfully
-                            @Override
-                            public void onComplete(@NonNull Task<Uri> task) {
-                                Toast.makeText(getContext(), task.getResult().toString(), Toast.LENGTH_SHORT).show();
-                                user.setImage(task.getResult().toString());
-                                updateData();
-                            }
+                profileFirstNameEditText.setTextAppearance(R.style.EditTextStyle);
+                profileLastNameEditText.setTextAppearance(R.style.EditTextStyle);
+                profileStatusEditText.setTextAppearance(R.style.EditTextStyle);
+                profileFirstNameEditText.getBackground().setColorFilter(ContextCompat.getColor(getContext(), R.color.transparent), PorterDuff.Mode.SRC_IN);
+                profileLastNameEditText.getBackground().setColorFilter(ContextCompat.getColor(getContext(), R.color.transparent), PorterDuff.Mode.SRC_IN);
+                profileStatusEditText.getBackground().setColorFilter(ContextCompat.getColor(getContext(), R.color.transparent), PorterDuff.Mode.SRC_IN);
+                editProfileImage.setVisibility(View.VISIBLE);
+                doneEditProfileImage.setVisibility(View.GONE);
+                uploadPhoto.setVisibility(View.GONE);
+                if (!profileStatusEditText.getText().toString().equals(user.getStatus())       ||
+                    !profileFirstNameEditText.getText().toString().equals(user.getFirstName()) ||
+                    !profileLastNameEditText.getText().toString().equals(user.getLastName())) {
+                    if (checkImage()) {
+                        Toast.makeText(getContext(), "Updating your profile...", Toast.LENGTH_SHORT).show();
+                        storageReference.child(storagePath).putFile(imageUri).addOnSuccessListener(taskSnapshot -> { //upload user image to fire base and receive URL to access it
+                            Task<Uri> task = taskSnapshot.getStorage().getDownloadUrl();
+                            task.addOnCompleteListener(new OnCompleteListener<Uri>() { //listener for image URL received successfully
+                                @Override
+                                public void onComplete(@NonNull Task<Uri> task) {
+                                    user.setImage(task.getResult().toString());
+                                    updateData();
+                                }
+                            });
                         });
-                    });
+                    } else
+                        updateData();
                 }
-                else
-                    updateData();
             }
         });
 
@@ -176,24 +199,23 @@ public class Profile extends Fragment {
     }
 
     private void updateData() {
-        editProfileImage.setVisibility(View.VISIBLE);
-        doneEditProfileImage.setVisibility(View.GONE);
-        uploadPhoto.setVisibility(View.GONE);
-
         user.setFirstName(profileFirstNameEditText.getText().toString());
         user.setLastName(profileLastNameEditText.getText().toString());
         user.setStatus(profileStatusEditText.getText().toString());
-        //user.setImage(task.getResult().toString());
         Map<String, Object> values = user.toMap();
-
         databaseReference = FirebaseDatabase.getInstance().getReference("Users");
         databaseReference.child(Objects.requireNonNull(user.getuID())).updateChildren(values).addOnCompleteListener(new OnCompleteListener<Void>() { //listener for get reference to user's fields in fire base successfully
             @Override
             public void onComplete(@NonNull Task<Void> task) {
+                utils.hideKeyBoard(getActivity(), getView());
                 if (task.isSuccessful()) {
-                    Toast.makeText(getContext(), "Your profile updated", Toast.LENGTH_SHORT).show();
-                } else
-                    Toast.makeText(getContext(), "Failed to update", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "Your profile has been updated", Toast.LENGTH_SHORT).show();
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                    editor.putString("username", user.getFirstName() + " " + user.getLastName()).apply(); //save user's first and last name in Shared Preferences
+                    editor.putString("userImage", user.getImage()).apply(); //save user's image url in Shared Preferences
+                }
+                else
+                    Toast.makeText(getContext(), "Failed to update your profile", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -227,7 +249,6 @@ public class Profile extends Fragment {
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                SharedPreferences sharedPreferences;
                 if (dataSnapshot.exists()) { //get the information from fire base and update the widgets with it
                     user = dataSnapshot.getValue(UserModel.class);
                     profileName.setText(user.getFirstName() + " " + user.getLastName());
@@ -248,17 +269,14 @@ public class Profile extends Fragment {
                     else {
                         profileLastSeen.setText(profilePhoneNumber.getText().toString());
                         String d = null;
-                        sharedPreferences = getContext().getSharedPreferences("UserData", Context.MODE_PRIVATE);
                         Picasso.get().load(sharedPreferences.getString("userImage", d)).into(imgProfile);
                         Picasso.get().load(sharedPreferences.getString("userImage", d)).fit().into(profileImage);
                         //Toast.makeText(getContext(), sharedPreferences.getString("userImage", d), Toast.LENGTH_SHORT).show();
-
                     }
                 }
             }
             @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-            }
+            public void onCancelled(@NonNull DatabaseError databaseError) { }
         });
     }
 }

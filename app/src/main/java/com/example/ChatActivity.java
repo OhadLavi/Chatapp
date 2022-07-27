@@ -211,4 +211,16 @@ public class ChatActivity extends AppCompatActivity {
 //        MessageModel messageModel = new MessageModel(myID, friendID, msg, utils.currentData(), "text");
 //        databaseReference.push().setValue(messageModel);
 //    }
+
+    @Override
+    protected void onResume() {
+        utils.updateOnlineStatus("online");
+        super.onResume();
+    }
+
+    @Override
+    protected void onPause() {
+        utils.updateOnlineStatus(Utils.getTimeAgo(System.currentTimeMillis()));
+        super.onPause();
+    }
 }

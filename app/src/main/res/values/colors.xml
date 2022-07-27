@@ -11,7 +11,7 @@
     <color name ="lightGray">#BABABA</color>
     <color name="chatBubble">#1d282f</color>
     <color name="chatText">#63737c</color>
-    <color name="menu">#1d282f</color>
+    <color name="menu">#292f3f</color>
     <color name="menuText">#63737c</color>
     <color name="colorPrimary">#114c9e</color>
     <color name="test">#052147</color>
@@ -23,6 +23,7 @@
     <color name="secondary_text">#FFFFFFFF</color>
     <color name="input_color">#e0e0e0</color>
     <color name="error">#630606</color>
+    <color name="red">#ff0000</color>
     <color name="imagePicker">#2978A5</color>
     <color name="buttonColor">#2978A5</color>
     <color name="chatBackground">#292f3f</color>
@@ -30,10 +31,14 @@
     <color name="chatDate">#a8aebe</color>
     <color name="updatePhotoIcon">#a8aebe</color>
     <color name="chatMessage">#a8aebe</color>
+    <color name="phoneNumberProfile">#a8aebe</color>
     <color name="editProfileImageColor">#a8aebe</color>
+    <color name="editProfileEditTexts">#a8aebe</color>
     <color name="chatSearch">#292f3f</color>
     <color name="chatMessageInput">#3d4354</color>
     <color name="chatMessageTextColor">#9498a1</color>
     <color name="rightBubbleBackground">#7a8194</color>
     <color name="leftBubbleBackground">#373e4e</color>
+    <color name="colorAccent">#0000ff</color>
+    <color name="transparent">@android:color/transparent</color>
 </resources>
