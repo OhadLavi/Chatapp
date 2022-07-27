@@ -33,7 +33,7 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Dashboard extends AppCompatActivity {
+public class Dashboard extends AppCompatActivity implements SearchView.OnQueryTextListener {
 
     private RecyclerView recyclerView;
     private UserAdapter userAdapter;
@@ -65,6 +65,7 @@ public class Dashboard extends AppCompatActivity {
         mUsers = new ArrayList<>(); //crete an array list of users according the UserModel POJO
         SearchView searchView = findViewById(R.id.contactSearchView); //define the search bar on the top of the dashboard view
         SearchView.SearchAutoComplete theTextArea = searchView.findViewById(androidx.appcompat.R.id.search_src_text);
+        searchView.setOnQueryTextListener(this);
         theTextArea.setTextColor(getResources().getColor(R.color.white));
 //        theTextArea.setTextCursorDrawable(R.color.white);
 //        theTextArea.setTextCursorDrawable(Drawable.createFromPath("@drawable/chat_cursor"));
@@ -141,6 +142,18 @@ public class Dashboard extends AppCompatActivity {
     protected void onPause() {
         utils.updateOnlineStatus(String.valueOf(System.currentTimeMillis()));
         super.onPause();
+    }
+
+    @Override
+    public boolean onQueryTextSubmit(String query) {
+        return false;
+    }
+
+    @Override
+    public boolean onQueryTextChange(String newText) {
+        if (userAdapter != null)
+            userAdapter.getFilter().filter(newText);
+        return false;
     }
 
 }

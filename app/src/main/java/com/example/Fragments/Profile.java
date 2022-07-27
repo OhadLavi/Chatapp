@@ -5,11 +5,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.PorterDuff;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.InputType;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
@@ -19,6 +22,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.view.ContextThemeWrapper;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
@@ -67,8 +74,15 @@ public class Profile extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+//        ActionBar toolbar = ((AppCompatActivity) getActivity()).getSupportActionBar();
+//        getActivity().setTheme(R.style.AppBarOverlay);
+//        toolbar.getThemedContext().setTheme(R.style.AppBarOverlay);
+//        LayoutInflater themedInflater = LayoutInflater.from(new
+//                ContextThemeWrapper(getContext(), R.style.AppBarOverlay));
+        //View view = themedInflater.inflate(R.layout.fragment_profile, container, false);
+        //getContext().getTheme().applyStyle(R.style.actionBarStyle, true);
         View view = inflater.inflate(R.layout.fragment_profile, container, false); //inflate fragment_profile.xml
-        getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
+       // getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
 //        ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
 //        LayoutInflater inflator = (LayoutInflater) (LocationManager)getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 //        View v = inflator.inflate(R.layout.custom_actionbar, null);
@@ -76,6 +90,13 @@ public class Profile extends Fragment {
         //((AppCompatActivity) getActivity()).getSupportActionBar().hide();
 //        ((AppCompatActivity) getActivity()).setSupportActionBar(view.findViewById(R.id.toolbar));
         //((AppCompatActivity)getActivity()).getSupportActionBar().setTitle("");
+//        Toolbar toolbar = (Toolbar) getActivity().findViewById(R.id.profileToolbar);
+//        ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
+//        setHasOptionsMenu(true);
+//        ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
+        //((AppCompatActivity) getActivity()).getSupportActionBar().setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.transparent)));
+        //((AppCompatActivity) getActivity()).getSupportActionBar().getThemedContext().setTheme(R.style.actionBarStyle);
+
         firebaseAuth = FirebaseAuth.getInstance(); //receive an instance to fire base
         storageReference = FirebaseStorage.getInstance().getReference();
         utils = new Utils();
@@ -258,7 +279,7 @@ public class Profile extends Fragment {
                     profileStatusEditText.setText(user.getStatus());
                     if(!myProfile) {
                         String lastSeen = null;
-                        if (user.getOnline().equals("Online"))
+                        if (!user.getOnline().equals("online"))
                             lastSeen = Utils.getTimeAgo(Long.parseLong(user.getOnline()));
                         profileLastSeen.setText(lastSeen == null ? "Online" : "Last seen " + lastSeen);
                         if (!user.getImage().equals("")) {

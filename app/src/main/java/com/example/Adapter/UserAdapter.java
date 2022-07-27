@@ -7,6 +7,8 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -24,22 +26,26 @@ import com.example.project3.R;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
-public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
+public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> implements Filterable  {
 
     private Context context;
-    private List<UserModel> mUsers;
+    private List<UserModel> mUsers, filterArrayList;
 
     public UserAdapter(Context context, List<UserModel> mUsers) {
         this.context = context;
         this.mUsers = mUsers;
+        filterArrayList = new ArrayList<>();
+        filterArrayList.addAll(mUsers);
     }
 
     public UserAdapter(Context context, UserModel mUsers) {
         this.context = context;
         this.mUsers = new ArrayList<>();
         this.mUsers.add(mUsers);
+        this.filterArrayList.add(mUsers);
     }
 
     @NonNull
@@ -103,4 +109,36 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
             userImage = itemView.findViewById(R.id.userImage);
         }
     }
+
+
+    @Override
+    public Filter getFilter() {
+        return contactFilter;
+    }
+
+    private Filter contactFilter = new Filter() {
+        @Override
+        protected FilterResults performFiltering(CharSequence constraint) {
+            List<UserModel> filteredList = new ArrayList<>();
+            if (constraint == null || constraint.length() == 0)
+                filteredList.addAll(filterArrayList);
+            else {
+                String filter = constraint.toString().toLowerCase().trim();
+                for (UserModel userModel : filterArrayList) {
+                    if (userModel.getFirstName().toLowerCase().contains(filter) ||
+                        userModel.getLastName().toLowerCase().contains(filter))
+                        filteredList.add(userModel);
+                }
+            }
+            FilterResults filterResults = new FilterResults();
+            filterResults.values = filteredList;
+            return filterResults;
+        }
+        @Override
+        protected void publishResults(CharSequence constraint, FilterResults results) {
+            mUsers.clear();
+            mUsers.addAll((Collection<? extends UserModel>) results.values);
+            notifyDataSetChanged();
+        }
+    };
 }

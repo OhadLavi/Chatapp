@@ -90,12 +90,13 @@ public class ChatActivity extends AppCompatActivity {
                 assert friendModel != null; //check that friend model isn't null
                 friendID = friendModel.getuID(); //get friend id using the getter of the UserModel
                 String lastSeen = null;
-                if(friendModel.getOnline().equals("Online"))
+                if(!friendModel.getOnline().equals("online"))
                     lastSeen = Utils.getTimeAgo(Long.parseLong(friendModel.getOnline())); //get the last seen information of the friend and save as string
                 onlineStatus.setText(lastSeen == null ? "Online" : "Last seen " + lastSeen); //set text to online status text view (null = friend online right now else set "last seen XX:XX")
                 friendNameString = friendModel.getFirstName() + " " + friendModel.getLastName(); //get string with the friend first and last name
                 friendNameTV.setText(friendNameString); //set name to be shown in the text view
-                Picasso.get().load(friendModel.getImage()).into(friendImage); //load friend image
+                if (!friendModel.getImage().equals(""))
+                    Picasso.get().load(friendModel.getImage()).into(friendImage); //load friend's image
 
                 findViewById(R.id.callFriend).setOnClickListener(view1 -> startActivity(new Intent(Intent.ACTION_DIAL,
                         Uri.parse("tel:" + friendModel.getNumber())))); //define listener for the dial button that will take user to dial screen and set the number to be the friend number

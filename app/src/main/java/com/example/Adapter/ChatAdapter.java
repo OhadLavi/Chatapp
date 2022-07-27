@@ -6,6 +6,8 @@ import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -30,16 +32,17 @@ import com.squareup.picasso.Picasso;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
 public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
 
-    private final String chatID;
+    private final String chatID, imageURL;
     private Context context;
     private List<ChatModel> mChat;
-    private String imageURL;
     private FirebaseUser firebaseUser;
     private DatabaseReference databaseReference;
     public static final int MSG_TYPE_LEFT = 0; //used to choose the chat bubble: 0 - left_bubble_layout.xml , 1 - right_bubble_layout.xml
