@@ -7,19 +7,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Bundle;
-
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-import androidx.databinding.DataBindingUtil;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
-
+import android.os.CountDownTimer;
 import android.provider.Telephony;
 import android.telephony.SmsMessage;
 import android.text.Editable;
@@ -28,10 +16,23 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.databinding.DataBindingUtil;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.chaos.view.PinView;
 import com.example.Model.UserModel;
+import com.example.Utils;
 import com.example.project3.R;
 import com.example.project3.databinding.FragmentVerifyNumberBinding;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -48,23 +49,30 @@ import com.google.firebase.database.FirebaseDatabase;
 import java.util.concurrent.TimeUnit;
 
 public class VerifyNumber extends Fragment {
+    private static PinView otpTextViewPinView;
+    private final ActivityResultLauncher<String> requestPermissionLauncher =
+            registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
+                if (isGranted) {
+                    // Permission is granted. Continue the action or workflow in your
+                } else
+                    Toast.makeText(getContext(), "Grant SMS permission?", Toast.LENGTH_LONG).show();
+            });
     //private FragmentVerifyNumberBinding binding;
     private FragmentVerifyNumberBinding binding;
     private FirebaseAuth firebaseAuth;
     private DatabaseReference databaseReference;
     private String OTPcode, phoneNumber;
-    private static PinView otpTextViewPinView;
+    private TextView resendOTPcode, countDownTimer;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        binding = DataBindingUtil.inflate(inflater,R.layout.fragment_verify_number, container, false); //inflate fragment_verify_number.xml
+        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_verify_number, container, false); //inflate fragment_verify_number.xml
         View view = binding.getRoot();
         otpTextViewPinView = view.findViewById(R.id.otp_text_view);
         Toolbar toolbar = (Toolbar) view.findViewById(R.id.toolbar); //set toolbar properties
         toolbar.setTitle("");
         toolbar.setSubtitle("");
-        toolbar.setBackgroundColor(Color.parseColor("#212529"));
         toolbar.setNavigationIcon(getResources().getDrawable(R.drawable.back_arrow));
         //((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
         //((AppCompatActivity)getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -84,20 +92,64 @@ public class VerifyNumber extends Fragment {
             phoneNumber = bundle.getString("phoneNumber");
         }
         view.findViewById(R.id.verifyButton).setOnClickListener(view1 -> { //set listener for click on the verify button
-            if(checkOTPcode(binding.otpTextView.getText().toString().trim())) { //check if the opt code is valid
+            if (checkOTPcode(binding.otpTextView.getText().toString().trim())) { //check if the opt code is valid
+                Utils util = new Utils();
+                util.hideKeyBoard(getActivity(), view);
                 binding.otpTextView.setVisibility(View.GONE);
                 binding.verifyButton.setVisibility(View.GONE);
                 binding.spinKit2.setVisibility(View.VISIBLE);
                 verifyPhoneNumberWithCode(binding.otpTextView.getText().toString().trim());
-            }
-            else
+            } else
                 Toast.makeText(getContext(), "Invalid OTP code", Toast.LENGTH_SHORT).show();
         });
 
-        binding.resendOTPcode.setOnClickListener(view2 -> { //set listener for click on the resend opt option
+        countDownTimer = view.findViewById(R.id.countDownTimer);
+        CountDownTimer c = new CountDownTimer(30000, 1000) {
+            public void onTick(long millisUntilFinished) {
+                countDownTimer.setText(" (" + millisUntilFinished / 1000 + ")");
+            }
+            public void onFinish() {
+                countDownTimer.setText("");
+                resendOTPcode.setTextColor(ContextCompat.getColor(getContext(), R.color.colorPrimary));
+            }
+        }.start();
+
+        resendOTPcode = view.findViewById(R.id.resendOTPcode);
+        resendOTPcode.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(getContext(), "Sending new OTP code", Toast.LENGTH_SHORT).show();
+                PhoneAuthProvider.OnVerificationStateChangedCallbacks mCallBack = new PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
+                    @Override
+                    public void onVerificationCompleted(@NonNull PhoneAuthCredential phoneAuthCredential) {
+                    }
+
+                    @Override
+                    public void onVerificationFailed(@NonNull FirebaseException e) {
+                        c.start();
+                    }
+
+                    @Override
+                    public void onCodeSent(@NonNull String s, @NonNull PhoneAuthProvider.ForceResendingToken forceResendingToken) {
+                        super.onCodeSent(s, forceResendingToken);
+                        c.cancel();
+                    }
+                };
+                PhoneAuthOptions options =
+                        PhoneAuthOptions.newBuilder(firebaseAuth)
+                                .setPhoneNumber(phoneNumber)       // Phone number to verify
+                                .setTimeout(30L, TimeUnit.SECONDS) // Timeout and unit
+                                .setActivity(getActivity())                 // Activity (for callback binding)
+                                .setCallbacks(mCallBack)          // OnVerificationStateChangedCallbacks
+                                .build();
+                PhoneAuthProvider.verifyPhoneNumber(options);
+            }
+        });
+        /*binding.resendOTPcode.setOnClickListener(view2 -> { //set listener for click on the resend opt option
             PhoneAuthProvider.OnVerificationStateChangedCallbacks mCallBack = new PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
                 @Override
                 public void onVerificationCompleted(@NonNull PhoneAuthCredential phoneAuthCredential) {
+                    Toast.makeText(getContext(), "test", Toast.LENGTH_SHORT).show();
                 }
                 //if sending new opt failed
                 @Override
@@ -122,7 +174,7 @@ public class VerifyNumber extends Fragment {
                             .build();
             PhoneAuthProvider.verifyPhoneNumber(options);
 
-        });
+        });*/
         //check if opt code length is valid (==6) and calls the OnClickListener of verify button
 //        binding.otpTextView.setOnClickListener(new View.OnClickListener() {
 //            @Override
@@ -133,17 +185,30 @@ public class VerifyNumber extends Fragment {
 //        });
         binding.otpTextView.addTextChangedListener(new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) { }
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            }
+
             @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) { }
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            }
+
             @Override
             public void afterTextChanged(Editable editable) {
-                if(binding.otpTextView.getText().toString().length() == 6)
+                if (binding.otpTextView.getText().toString().length() == 6)
                     binding.verifyButton.performClick();
             }
         });
-
         return view;
+    }
+
+    private void checkPermissions(String permission) {
+        if (ContextCompat.checkSelfPermission(getContext(), permission) == PackageManager.PERMISSION_GRANTED) {
+            // You can use the API that requires the permission.
+        } else if (ActivityCompat.shouldShowRequestPermissionRationale(getActivity(), permission)) {
+            Toast.makeText(getContext(), "Grant SMS permission?", Toast.LENGTH_LONG).show();
+        } else {
+            requestPermissionLauncher.launch(permission);
+        }
     }
 
     private boolean checkOTPcode(String s) { //return true if otp code length is 6
@@ -151,8 +216,12 @@ public class VerifyNumber extends Fragment {
     }
 
     private void verifyPhoneNumberWithCode(String code) { //compares the user opt code with the sent code and allow user to continue if its valid
-        PhoneAuthCredential credential = PhoneAuthProvider.getCredential(OTPcode, code);
-        signInWithPhoneAuthCredential(credential);
+        try {
+            PhoneAuthCredential credential = PhoneAuthProvider.getCredential(OTPcode, code);
+            signInWithPhoneAuthCredential(credential);
+        } catch (Exception e) {
+            Toast.makeText(getContext(), e.toString(), Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void signInWithPhoneAuthCredential(PhoneAuthCredential credential) {
@@ -160,7 +229,7 @@ public class VerifyNumber extends Fragment {
                 .addOnCompleteListener(getActivity(), task -> {
                     if (task.isSuccessful()) { //if signInWithCredential task completed successfully
                         UserModel userModel = new UserModel("", "", "", firebaseAuth.getCurrentUser().getPhoneNumber(),
-                                firebaseAuth.getUid(), "online", "false", task.getResult().toString(),""); //crate new model for user according UserModel POJO and initialize fields
+                                firebaseAuth.getUid(), "online", "false", task.getResult().toString(), ""); //crate new model for user according UserModel POJO and initialize fields
 
                         //after initialize complete,replace the fragment with UserData fragment (That fragment allows user to fill his profile information: first and last name & image)
                         databaseReference.child(firebaseAuth.getUid()).setValue(userModel).addOnCompleteListener(new OnCompleteListener<Void>() {
@@ -186,29 +255,9 @@ public class VerifyNumber extends Fragment {
                 });
     }
 
-    private void checkPermissions(String permission) {
-        if (ContextCompat.checkSelfPermission(getContext(), permission) ==PackageManager.PERMISSION_GRANTED) {
-            // You can use the API that requires the permission.
-        } else if (ActivityCompat.shouldShowRequestPermissionRationale(getActivity(), permission)) {
-            Toast.makeText(getContext(), "Grant SMS permission?", Toast.LENGTH_LONG).show();
-        } else {
-            // You can directly ask for the permission.
-            // The registered ActivityResultCallback gets the result of this request.
-            requestPermissionLauncher.launch(permission);
-        }
-    }
-
-    private final ActivityResultLauncher<String> requestPermissionLauncher =
-            registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
-                if (isGranted) {
-                    // Permission is granted. Continue the action or workflow in your
-                } else
-                    Toast.makeText(getContext(), "Grant SMS permission?", Toast.LENGTH_LONG).show();
-            });
-
-
     public static class SMSbroadcast extends BroadcastReceiver {
         private String SMS = "android.provider.Telephony.SMS_RECEIVED";
+
         @Override
         public void onReceive(Context context, Intent intent) {
             if (intent.getAction().equals(Telephony.Sms.Intents.SMS_RECEIVED_ACTION)) {
@@ -229,5 +278,4 @@ public class VerifyNumber extends Fragment {
             }
         }
     }
-
 }

@@ -31,19 +31,20 @@ public class Utils {
         InputMethodManager inputMethodManager =(InputMethodManager)activity.getSystemService(Activity.INPUT_METHOD_SERVICE);
         inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
+
     public String currentDate() { //return the date of today in the format sdf as defined below
         Calendar calendar = Calendar.getInstance();
         Date date = calendar.getTime();
-        SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy HH-mm-ss", Locale.FRENCH);
-        df.setTimeZone(TimeZone.getTimeZone("Asia/Jerusalem"));
-        return df.format(date);
+        sdf().setTimeZone(TimeZone.getTimeZone("Asia/Jerusalem"));
+        return sdf().format(date);
         //return sdf().format(calendar.getTimeInMillis());
         //calendar.setTimeZone(TimeZone.getTimeZone(timezone));
+    }
 
-    }
     public static SimpleDateFormat sdf() {
-        return new SimpleDateFormat("yyyy-MM-dd hh-mm-ss a", Locale.FRENCH);
+        return new SimpleDateFormat("dd/MM/yyyy HH-mm-ss", Locale.FRENCH);
     }
+
     public static String getTimeAgo(long time) { //return a string with the "last seen" time
         if (time < 1000000000000L)
             time *= 1000;

@@ -24,6 +24,8 @@
     <color name="input_color">#e0e0e0</color>
     <color name="error">#630606</color>
     <color name="red">#ff0000</color>
+    <color name="pinViewLine">#61b7ff</color>
+    <color name="registerBorder">#2e343b</color>
     <color name="imagePicker">#2978A5</color>
     <color name="buttonColor">#2978A5</color>
     <color name="chatBackground">#292f3f</color>
@@ -41,4 +43,6 @@
     <color name="leftBubbleBackground">#373e4e</color>
     <color name="colorAccent">#0000ff</color>
     <color name="transparent">@android:color/transparent</color>
+    <color name="buttonNegativeColor">#292f3f</color>
+    <color name="buttonPositiveColor">#b94c56</color>
 </resources>

@@ -1,37 +1,36 @@
 package com.example.Fragments;
 
+import android.Manifest;
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.graphics.PorterDuff;
-import android.graphics.drawable.ColorDrawable;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.InputType;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.view.ContextThemeWrapper;
-import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import com.example.Adapter.UserAdapter;
 import com.example.ChatActivity;
-import com.example.Dashboard;
 import com.example.Model.UserModel;
 import com.example.Utils;
 import com.example.project3.R;
@@ -52,10 +51,19 @@ import java.util.Map;
 import java.util.Objects;
 
 public class Profile extends Fragment {
-    private TextView profileName, profilePhoneNumber, profileLastSeen;
-    private EditText  profileFirstNameEditText, profileLastNameEditText, profileStatusEditText;
+    public static final int PICK_IMAGE = 1;
+    private final ActivityResultLauncher<String> requestPermissionLauncher =
+            registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
+                if (isGranted) {
+                    pickImage();
+                } else {
+                    Toast.makeText(getActivity(), "You must grant SMS permission", Toast.LENGTH_LONG).show();
+                }
+            });
+    private TextView profileName, profilePhoneNumber, profileLastSeen, clearConversation;
+    private EditText profileFirstNameEditText, profileLastNameEditText, profileStatusEditText;
     private ImageView profileImage, imgProfile, editProfileImage, doneEditProfileImage, uploadPhoto;
-    private String storagePath;
+    private String storagePath, myID, chatID;
     private UserModel user;
     private UserAdapter userAdapter;
     private boolean myProfile;
@@ -82,7 +90,7 @@ public class Profile extends Fragment {
         //View view = themedInflater.inflate(R.layout.fragment_profile, container, false);
         //getContext().getTheme().applyStyle(R.style.actionBarStyle, true);
         View view = inflater.inflate(R.layout.fragment_profile, container, false); //inflate fragment_profile.xml
-       // getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
+        // getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
 //        ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
 //        LayoutInflater inflator = (LayoutInflater) (LocationManager)getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 //        View v = inflator.inflate(R.layout.custom_actionbar, null);
@@ -98,11 +106,12 @@ public class Profile extends Fragment {
         //((AppCompatActivity) getActivity()).getSupportActionBar().getThemedContext().setTheme(R.style.actionBarStyle);
 
         firebaseAuth = FirebaseAuth.getInstance(); //receive an instance to fire base
+        myID = firebaseAuth.getCurrentUser().getUid();
         storageReference = FirebaseStorage.getInstance().getReference();
         utils = new Utils();
         storagePath = firebaseAuth.getUid() + "Media/Profile_Image/profile"; //get user profile image path
         sharedPreferences = getContext().getSharedPreferences("UserData", Context.MODE_PRIVATE);
-        if(getActivity().findViewById(R.id.card) != null)
+        if (getActivity().findViewById(R.id.card) != null)
             getActivity().findViewById(R.id.card).setVisibility(View.GONE);
         profileName = view.findViewById(R.id.profileName);
         profilePhoneNumber = view.findViewById(R.id.profilePhoneNumber);
@@ -112,16 +121,77 @@ public class Profile extends Fragment {
         editProfileImage = view.findViewById(R.id.editProfileDetails);
         doneEditProfileImage = view.findViewById(R.id.DoneEditingProfileDetails);
         uploadPhoto = view.findViewById(R.id.uploadPhoto);
-
         profileFirstNameEditText = view.findViewById(R.id.profileFirstNameEdit);
         profileLastNameEditText = view.findViewById(R.id.profileLastNameEdit);
         profileStatusEditText = view.findViewById(R.id.profileStatusEdit);
         profileFirstNameEditText.setInputType(InputType.TYPE_NULL);
         profileLastNameEditText.setInputType(InputType.TYPE_NULL);
         profileStatusEditText.setInputType(InputType.TYPE_NULL);
-
         uploadPhoto.setVisibility(View.GONE);
         doneEditProfileImage.setVisibility(View.GONE);
+        clearConversation = view.findViewById(R.id.clearConversation);
+        clearConversation.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(new ContextThemeWrapper(view.getContext(), R.style.AlertDialogCustom));
+                // set title
+                alertDialogBuilder.setTitle("Deleting chat");
+                alertDialogBuilder.setCancelable(true);
+                // set dialog message
+                alertDialogBuilder
+                        .setMessage(String.format("Are you sure that you want to delete the chat with %s %s?", user.getFirstName(), user.getLastName()))
+                        .setCancelable(true)
+                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                try {
+                                    databaseReference = FirebaseDatabase.getInstance().getReference("ChatList").child(myID); //reference to fire base chat list that include the current logged in user id
+                                    Query query = databaseReference.orderByChild("member").equalTo(user.getuID()); //order the chat list by friend id
+                                    query.addValueEventListener(new ValueEventListener() { //listener for data changes
+                                        @Override
+                                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                            if (dataSnapshot.hasChildren()) { //find the chat between current logged in user and its friend and read the messages form it
+                                                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                                                    String id = snapshot.child("member").getValue().toString();
+                                                    if (id.equals(user.getuID())) {
+                                                        chatID = snapshot.getKey();
+
+                                                        snapshot.getRef().removeValue();
+                                                        FirebaseDatabase.getInstance().getReference("ChatList").child(user.getuID()).child(chatID).removeValue();
+                                                        FirebaseDatabase.getInstance().getReference("Chat").child(chatID).removeValue();
+                                                        chatID = null;
+                                                        new AlertDialog.Builder(new ContextThemeWrapper(view.getContext(), R.style.AlertDialogCustom))
+                                                                .setTitle("Chat deleted")
+                                                                .setMessage(String.format("Your chat with %s deleted successfully", user.getFirstName(), user.getLastName()))
+                                                                .setNeutralButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                                                                    public void onClick(DialogInterface dialog, int which) {
+                                                                        dialog.cancel();
+                                                                    }
+                                                                })
+                                                                .setIcon(android.R.drawable.ic_dialog_info)
+                                                                .show();
+                                                        break;
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        @Override
+                                        public void onCancelled(@NonNull DatabaseError error) { }
+                                    });
+                                } catch (Exception e) {
+                                    Toast.makeText(getContext(), e.toString(), Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                        })
+                        .setNegativeButton("No", (dialog, id) -> dialog.cancel());
+                // create alert dialog
+                AlertDialog alertDialog = alertDialogBuilder.create();
+                // show it
+                alertDialog.setIcon(android.R.drawable.ic_dialog_alert);
+                alertDialog.show();
+            }
+
+        });
         editProfileImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -140,13 +210,10 @@ public class Profile extends Fragment {
                 uploadPhoto.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        if(utils.isStorageOk(getContext()))
+                        if (utils.isStorageOk(getContext()))
                             pickImage();
-                        else {
-                            utils.requestStorage(getActivity());
-                            if(utils.isStorageOk(getContext()))
-                                pickImage();
-                        }
+                        else
+                            checkPermissions(Manifest.permission.READ_EXTERNAL_STORAGE);
                     }
                 });
             }
@@ -167,9 +234,9 @@ public class Profile extends Fragment {
                 editProfileImage.setVisibility(View.VISIBLE);
                 doneEditProfileImage.setVisibility(View.GONE);
                 uploadPhoto.setVisibility(View.GONE);
-                if (!profileStatusEditText.getText().toString().equals(user.getStatus())       ||
-                    !profileFirstNameEditText.getText().toString().equals(user.getFirstName()) ||
-                    !profileLastNameEditText.getText().toString().equals(user.getLastName())) {
+                if (!profileStatusEditText.getText().toString().equals(user.getStatus()) ||
+                        !profileFirstNameEditText.getText().toString().equals(user.getFirstName()) ||
+                        !profileLastNameEditText.getText().toString().equals(user.getLastName())) {
                     if (checkImage()) {
                         Toast.makeText(getContext(), "Updating your profile...", Toast.LENGTH_SHORT).show();
                         storageReference.child(storagePath).putFile(imageUri).addOnSuccessListener(taskSnapshot -> { //upload user image to fire base and receive URL to access it
@@ -192,7 +259,7 @@ public class Profile extends Fragment {
         if (bundle != null) {
             getUserDetail(bundle.getString("userID")); //call method getUserDetail with userID string
             myProfile = bundle.getBoolean("myProfile");
-            if(!myProfile) {
+            if (!myProfile) {
                 view.findViewById(R.id.callFriend).setOnClickListener(view1 -> startActivity(new Intent(Intent.ACTION_DIAL,
                         Uri.parse("tel:" + profilePhoneNumber.getText())))); //listener for click on the call button - if clicked a dial action to the friend number will be started
                 view.findViewById(R.id.sendMessage).setOnClickListener(new View.OnClickListener() { //listener for click on the send message button - if clicked a chat with the friend will be started
@@ -208,8 +275,7 @@ public class Profile extends Fragment {
                 view.findViewById(R.id.cardFirstName).setVisibility(View.GONE);
                 view.findViewById(R.id.cardLastName).setVisibility(View.GONE);
                 editProfileImage.setVisibility(View.GONE);
-            }
-            else {
+            } else {
                 view.findViewById(R.id.cardPhoneNumber).setVisibility(View.GONE);
                 view.findViewById(R.id.cardClearConversation).setVisibility(View.GONE);
                 view.findViewById(R.id.cardFirstName).setVisibility(View.VISIBLE);
@@ -217,6 +283,14 @@ public class Profile extends Fragment {
             }
         }
         return view;
+    }
+
+    private void checkPermissions(String permission) {
+        if (ContextCompat.checkSelfPermission(getContext(), permission) == PackageManager.PERMISSION_GRANTED) {
+        } else if (ActivityCompat.shouldShowRequestPermissionRationale(getActivity(), permission))
+            Toast.makeText(getActivity(), "You must grant SMS permission", Toast.LENGTH_LONG).show();
+        else
+            requestPermissionLauncher.launch(permission);
     }
 
     private void updateData() {
@@ -234,14 +308,12 @@ public class Profile extends Fragment {
                     SharedPreferences.Editor editor = sharedPreferences.edit();
                     editor.putString("username", user.getFirstName() + " " + user.getLastName()).apply(); //save user's first and last name in Shared Preferences
                     editor.putString("userImage", user.getImage()).apply(); //save user's image url in Shared Preferences
-                }
-                else
+                } else
                     Toast.makeText(getContext(), "Failed to update your profile", Toast.LENGTH_SHORT).show();
             }
         });
     }
 
-    public static final int PICK_IMAGE = 1;
     private void pickImage() { //create new implicit intent to get image from user
         Intent intent = new Intent();
         intent.setType("image/*");
@@ -277,17 +349,18 @@ public class Profile extends Fragment {
                     profileLastNameEditText.setText(user.getLastName());
                     profilePhoneNumber.setText(user.getNumber());
                     profileStatusEditText.setText(user.getStatus());
-                    if(!myProfile) {
+                    if (!myProfile) {
                         String lastSeen = null;
-                        if (!user.getOnline().equals("online"))
+                        try {
                             lastSeen = Utils.getTimeAgo(Long.parseLong(user.getOnline()));
+                        } catch (Exception e) {
+                        }
                         profileLastSeen.setText(lastSeen == null ? "Online" : "Last seen " + lastSeen);
                         if (!user.getImage().equals("")) {
                             Picasso.get().load(user.getImage()).fit().into(profileImage);
                             Picasso.get().load(user.getImage()).into(imgProfile);
                         }
-                    }
-                    else {
+                    } else {
                         profileLastSeen.setText(profilePhoneNumber.getText().toString());
                         String d = null;
                         Picasso.get().load(sharedPreferences.getString("userImage", d)).into(imgProfile);
@@ -296,8 +369,10 @@ public class Profile extends Fragment {
                     }
                 }
             }
+
             @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) { }
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+            }
         });
     }
 }

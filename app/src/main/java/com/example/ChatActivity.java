@@ -13,6 +13,7 @@ import android.util.Log;
 
 import com.example.Adapter.ChatAdapter;
 import com.example.Adapter.UserAdapter;
+import com.example.Model.ChatListModel;
 import com.example.Model.ChatModel;
 import com.example.project3.R;
 
@@ -53,6 +54,7 @@ public class ChatActivity extends AppCompatActivity {
     private ChatAdapter chatAdapter;
     private List<ChatModel> mChat;
     private Context context;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -78,8 +80,8 @@ public class ChatActivity extends AppCompatActivity {
         findViewById(R.id.msgBack).setOnClickListener(view -> finish()); //listener for back button click, close the current activity and back to the activity that was before it called
 
         //if (getIntent().getData() != null)
-            userID = intent.getStringExtra("userID"); //get the user id
-        Log.e("userid", userID);
+        userID = intent.getStringExtra("userID"); //get the user id
+
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser(); //get current logged in user
         databaseReference = FirebaseDatabase.getInstance().getReference("Users").child(userID); //reference to the user in fire base by its id
         databaseReference.addValueEventListener(new ValueEventListener() { //listener for fire base data change
@@ -90,8 +92,7 @@ public class ChatActivity extends AppCompatActivity {
                 assert friendModel != null; //check that friend model isn't null
                 friendID = friendModel.getuID(); //get friend id using the getter of the UserModel
                 String lastSeen = null;
-                if(!friendModel.getOnline().equals("online"))
-                    lastSeen = Utils.getTimeAgo(Long.parseLong(friendModel.getOnline())); //get the last seen information of the friend and save as string
+                try { lastSeen = Utils.getTimeAgo(Long.parseLong(friendModel.getOnline())); } catch (Exception e) { } //get the last seen information of the friend and save as string
                 onlineStatus.setText(lastSeen == null ? "Online" : "Last seen " + lastSeen); //set text to online status text view (null = friend online right now else set "last seen XX:XX")
                 friendNameString = friendModel.getFirstName() + " " + friendModel.getLastName(); //get string with the friend first and last name
                 friendNameTV.setText(friendNameString); //set name to be shown in the text view
@@ -108,7 +109,13 @@ public class ChatActivity extends AppCompatActivity {
                         userAdapter.createChatFragment(friendModel, R.id.chatContainer);
                     }
                 });
-                checkChat(friendID); //call checkChat method that find the chat of current logged in user and his friend and load the message history from it
+                if (intent.hasExtra("chatID") && intent.getStringExtra("chatID") != null) {
+                    chatID = intent.getStringExtra("chatID");
+                    readMessages(chatID);
+                } else {
+                    checkChat(friendID);
+                }
+                //checkChat(friendID); //call checkChat method that find the chat of current logged in user and his friend and load the message history from it
             }
 
             @Override
@@ -131,24 +138,25 @@ public class ChatActivity extends AppCompatActivity {
     };
 
     private void sendMessage(String message) { //method for sending new message
-//        if (chatID == null )
-//            createChat(sender, receiver, message);
+        if (chatID == null) {
+            createChat(message);
+        }
 //        else {
-            date =  utils.currentDate(); //get the date of today
-            ChatModel messageModel = new ChatModel(myID, friendID, message, date, ""); //create new instance of a message according the ChatModel and initialize the fields: sender, receiver, message, date, type
-            databaseReference = FirebaseDatabase.getInstance().getReference("Chat").child(chatID); //get reference to fire base specific chat according its id
-            databaseReference.push().setValue(messageModel); //add the new message to the fire base specific chat
-
-            //crate new map object with the last message sent and its date
-            Map<String, Object> update = new HashMap<>();
-            update.put("lastMessage", message);
-            update.put("date", date);
-            //update in fire base both current user chat history and friend chat history with the last message
-            databaseReference = FirebaseDatabase.getInstance().getReference("ChatList").child(myID).child(chatID);
-            databaseReference.updateChildren(update);
-            databaseReference = FirebaseDatabase.getInstance().getReference("ChatList").child(friendID).child(chatID);
-            databaseReference.updateChildren(update);
-       // }
+//            date =  utils.currentDate(); //get the date of today
+//            ChatModel messageModel = new ChatModel(myID, friendID, message, date, ""); //create new instance of a message according the ChatModel and initialize the fields: sender, receiver, message, date, type
+//            databaseReference = FirebaseDatabase.getInstance().getReference("Chat").child(chatID); //get reference to fire base specific chat according its id
+//            databaseReference.push().setValue(messageModel); //add the new message to the fire base specific chat
+//
+//            //crate new map object with the last message sent and its date
+//            Map<String, Object> update = new HashMap<>();
+//            update.put("lastMessage", message);
+//            update.put("date", date);
+//            //update in fire base both current user chat history and friend chat history with the last message
+//            databaseReference = FirebaseDatabase.getInstance().getReference("ChatList").child(myID).child(chatID);
+//            databaseReference.updateChildren(update);
+//            databaseReference = FirebaseDatabase.getInstance().getReference("ChatList").child(friendID).child(chatID);
+//            databaseReference.updateChildren(update);
+//       }
     }
 
     private void readMessages(String chatID) { //method for read messages
@@ -168,10 +176,8 @@ public class ChatActivity extends AppCompatActivity {
                     recyclerView.setAdapter(chatAdapter); //set the recycle view adapter
                 }
             }
-
             @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-            }
+            public void onCancelled(@NonNull DatabaseError error) { }
         });
     }
 
@@ -193,25 +199,25 @@ public class ChatActivity extends AppCompatActivity {
                 }
             }
             @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-            }
+            public void onCancelled(@NonNull DatabaseError databaseError) { }
         });
     }
 
-//    private void createChat(String msg) {
-//        databaseReference = FirebaseDatabase.getInstance().getReference("ChatList").child(myID);
-//        chatID = databaseReference.push().getKey();
-//        ChatListModel chatListModel = new ChatListModel(chatID, utils.currentData(), msg, friendID);
-//        databaseReference.child(chatID).setValue(chatListModel);
-//
-//        databaseReference = FirebaseDatabase.getInstance().getReference("ChatList").child(friendID);
-//        ChatListModel chatList = new ChatListModel(chatID, utils.currentData(), msg, myID);
-//        databaseReference.child(chatID).setValue(chatList);
-//
-//        databaseReference = FirebaseDatabase.getInstance().getReference("Chat").child(chatID);
-//        MessageModel messageModel = new MessageModel(myID, friendID, msg, utils.currentData(), "text");
-//        databaseReference.push().setValue(messageModel);
-//    }
+    private void createChat(String msg) {
+        databaseReference = FirebaseDatabase.getInstance().getReference("ChatList").child(myID);
+        chatID = databaseReference.push().getKey();
+        ChatListModel chatListModel = new ChatListModel(chatID, utils.currentDate(), msg, friendID);
+        databaseReference.child(chatID).setValue(chatListModel);
+        Toast.makeText(context, chatID, Toast.LENGTH_SHORT).show();
+        Toast.makeText(context, friendID, Toast.LENGTH_SHORT).show();
+        databaseReference = FirebaseDatabase.getInstance().getReference("ChatList").child(friendID);
+        ChatListModel chatList = new ChatListModel(chatID, utils.currentDate(), msg, myID);
+        databaseReference.child(chatID).setValue(chatList);
+
+        databaseReference = FirebaseDatabase.getInstance().getReference("Chat").child(chatID);
+        ChatModel messageModel = new ChatModel(myID, friendID, msg, utils.currentDate(), "text");
+        databaseReference.push().setValue(messageModel);
+    }
 
     @Override
     protected void onResume() {

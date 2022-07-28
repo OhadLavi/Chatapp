@@ -10,6 +10,8 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -50,6 +52,14 @@ public class UserData extends Fragment {
     private Uri imageUri;
     private SharedPreferences sharedPreferences;
     private Utils utils;
+    private final ActivityResultLauncher<String> requestPermissionLauncher =
+            registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
+                if (isGranted) {
+                    pickImage();
+                } else {
+                    Toast.makeText(getActivity(), "You must grant SMS permission", Toast.LENGTH_LONG).show();
+                }
+            });
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -63,9 +73,6 @@ public class UserData extends Fragment {
         View view = binding.getRoot();
         utils = new Utils();
         Toolbar toolbar = (Toolbar) view.findViewById(R.id.toolbar); //set toolbar properties
-        toolbar.setTitle("");
-        toolbar.setSubtitle("");
-        toolbar.setBackgroundColor(Color.parseColor("#212529"));
         toolbar.setNavigationIcon(getResources().getDrawable(R.drawable.back_arrow));
         //((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
         //((AppCompatActivity)getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -87,11 +94,8 @@ public class UserData extends Fragment {
             public void onClick(View view) {
                 if(utils.isStorageOk(getContext()))
                     pickImage();
-                else {
-                    utils.requestStorage(getActivity());
-                    if(utils.isStorageOk(getContext()))
-                        pickImage();
-                }
+                else
+                    checkPermissions(Manifest.permission.READ_EXTERNAL_STORAGE);
             }
         });
 
@@ -106,8 +110,15 @@ public class UserData extends Fragment {
                     uploadData(); //upload to fire base
             }
         });
-
         return view;
+    }
+
+    private void checkPermissions(String permission) {
+        if (ContextCompat.checkSelfPermission(getContext(), permission) == PackageManager.PERMISSION_GRANTED) {
+        } else if (ActivityCompat.shouldShowRequestPermissionRationale(getActivity(), permission))
+            Toast.makeText(getActivity(), "You must grant SMS permission", Toast.LENGTH_LONG).show();
+          else
+            requestPermissionLauncher.launch(permission);
     }
 
     private boolean checkTextFields(EditText e) { //return true if text field isn't empty
@@ -167,7 +178,7 @@ public class UserData extends Fragment {
                                 editor.putString("userImage", url).apply(); //save user's image url in Shared Preferences
                                 Intent intent = new Intent(getContext(), Dashboard.class); //crate and start new intent with the dashboard
                                 Intent serviceIntent = new Intent(getActivity(), ForegroundService.class);
-                                ContextCompat.startForegroundService(getContext(), serviceIntent);
+                               // ContextCompat.startForegroundService(getContext(), serviceIntent);
                                 startActivity(intent);
                                 getActivity().finish(); //finish current fragment
                             } else
