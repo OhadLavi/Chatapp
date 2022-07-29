@@ -89,31 +89,35 @@ public class ChatActivity extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 myID = FirebaseAuth.getInstance().getUid(); //get current logged in user id from fire base
                 friendModel = snapshot.getValue(UserModel.class); //get the friend information according the UserModel POJO
-                assert friendModel != null; //check that friend model isn't null
-                friendID = friendModel.getuID(); //get friend id using the getter of the UserModel
-                String lastSeen = null;
-                try { lastSeen = Utils.getTimeAgo(Long.parseLong(friendModel.getOnline())); } catch (Exception e) { } //get the last seen information of the friend and save as string
-                onlineStatus.setText(lastSeen == null ? "Online" : "Last seen " + lastSeen); //set text to online status text view (null = friend online right now else set "last seen XX:XX")
-                friendNameString = friendModel.getFirstName() + " " + friendModel.getLastName(); //get string with the friend first and last name
-                friendNameTV.setText(friendNameString); //set name to be shown in the text view
-                if (!friendModel.getImage().equals(""))
-                    Picasso.get().load(friendModel.getImage()).into(friendImage); //load friend's image
+                if (friendModel != null) { //check that friend model isn't null
+                    friendID = friendModel.getuID(); //get friend id using the getter of the UserModel
+                    String lastSeen = null;
+                    try {
+                        lastSeen = Utils.getTimeAgo(Long.parseLong(friendModel.getOnline()));
+                    } catch (Exception e) {
+                    } //get the last seen information of the friend and save as string
+                    onlineStatus.setText(lastSeen == null ? "Online" : "Last seen " + lastSeen); //set text to online status text view (null = friend online right now else set "last seen XX:XX")
+                    friendNameString = friendModel.getFirstName() + " " + friendModel.getLastName(); //get string with the friend first and last name
+                    friendNameTV.setText(friendNameString); //set name to be shown in the text view
+                    if (!friendModel.getImage().equals(""))
+                        Picasso.get().load(friendModel.getImage()).into(friendImage); //load friend's image
 
-                findViewById(R.id.callFriend).setOnClickListener(view1 -> startActivity(new Intent(Intent.ACTION_DIAL,
-                        Uri.parse("tel:" + friendModel.getNumber())))); //define listener for the dial button that will take user to dial screen and set the number to be the friend number
+                    findViewById(R.id.callFriend).setOnClickListener(view1 -> startActivity(new Intent(Intent.ACTION_DIAL,
+                            Uri.parse("tel:" + friendModel.getNumber())))); //define listener for the dial button that will take user to dial screen and set the number to be the friend number
 
-                findViewById(R.id.toolbar).setOnClickListener(new View.OnClickListener() { //listener for click on the toolbar while in chat with friend
-                    @Override
-                    public void onClick(View view) { //create profile fragment on the friend with its all details and show it on screen (using createChatFragment method in the UserAdapter)
-                        UserAdapter userAdapter = new UserAdapter(context, friendModel);
-                        userAdapter.createChatFragment(friendModel, R.id.chatContainer);
+                    findViewById(R.id.toolbar).setOnClickListener(new View.OnClickListener() { //listener for click on the toolbar while in chat with friend
+                        @Override
+                        public void onClick(View view) { //create profile fragment on the friend with its all details and show it on screen (using createChatFragment method in the UserAdapter)
+                            UserAdapter userAdapter = new UserAdapter(context, friendModel);
+                            userAdapter.createChatFragment(friendModel, R.id.chatContainer);
+                        }
+                    });
+                    if (intent.hasExtra("chatID") && intent.getStringExtra("chatID") != null) {
+                        chatID = intent.getStringExtra("chatID");
+                        readMessages(chatID);
+                    } else {
+                        checkChat(friendID);
                     }
-                });
-                if (intent.hasExtra("chatID") && intent.getStringExtra("chatID") != null) {
-                    chatID = intent.getStringExtra("chatID");
-                    readMessages(chatID);
-                } else {
-                    checkChat(friendID);
                 }
                 //checkChat(friendID); //call checkChat method that find the chat of current logged in user and his friend and load the message history from it
             }
