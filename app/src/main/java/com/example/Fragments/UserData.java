@@ -6,28 +6,21 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
-
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.Toast;
-
-import com.example.Dashboard;
-import com.example.ForegroundService;
 import com.example.MainActivity;
 import com.example.Utils;
 import com.example.project3.R;
@@ -39,7 +32,6 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -58,7 +50,7 @@ public class UserData extends Fragment {
                 if (isGranted) {
                     pickImage();
                 } else {
-                    Toast.makeText(getActivity(), "You must grant SMS permission", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getActivity(), "You must grant SMS permission", Toast.LENGTH_LONG).show(); //TODO: change text to gallery view permission(?)
                 }
             });
 
@@ -75,7 +67,7 @@ public class UserData extends Fragment {
         utils = new Utils();
         Toolbar toolbar = (Toolbar) view.findViewById(R.id.toolbar); //set toolbar properties
         toolbar.setNavigationIcon(getResources().getDrawable(R.drawable.back_arrow));
-        //((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
+        //((AppCompatActivity)getActivity()).setSupportActionBar(toolbar); //TODO: delete (?)
         //((AppCompatActivity)getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         //toolbar.setNavigationOnClickListener(new View.OnClickListener() {
         //    @Override

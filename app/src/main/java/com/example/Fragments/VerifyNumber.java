@@ -5,7 +5,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.provider.Telephony;
@@ -18,7 +17,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
@@ -29,7 +27,6 @@ import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
-
 import com.chaos.view.PinView;
 import com.example.Model.UserModel;
 import com.example.Utils;
@@ -74,7 +71,7 @@ public class VerifyNumber extends Fragment {
         toolbar.setTitle("");
         toolbar.setSubtitle("");
         toolbar.setNavigationIcon(getResources().getDrawable(R.drawable.back_arrow));
-        //((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
+        //((AppCompatActivity)getActivity()).setSupportActionBar(toolbar); //TODO: delete (?)
         //((AppCompatActivity)getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         //toolbar.setNavigationOnClickListener(new View.OnClickListener() {
         //    @Override
@@ -103,7 +100,7 @@ public class VerifyNumber extends Fragment {
                 Toast.makeText(getContext(), "Invalid OTP code", Toast.LENGTH_SHORT).show();
         });
 
-        countDownTimer = view.findViewById(R.id.countDownTimer);
+        countDownTimer = view.findViewById(R.id.countDownTimer); //count down for resend opt
         CountDownTimer c = new CountDownTimer(30000, 1000) {
             public void onTick(long millisUntilFinished) {
                 countDownTimer.setText(" (" + millisUntilFinished / 1000 + ")");
@@ -145,7 +142,7 @@ public class VerifyNumber extends Fragment {
                 PhoneAuthProvider.verifyPhoneNumber(options);
             }
         });
-        /*binding.resendOTPcode.setOnClickListener(view2 -> { //set listener for click on the resend opt option
+        /*binding.resendOTPcode.setOnClickListener(view2 -> { //set listener for click on the resend opt option //TODO: delete (?)
             PhoneAuthProvider.OnVerificationStateChangedCallbacks mCallBack = new PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
                 @Override
                 public void onVerificationCompleted(@NonNull PhoneAuthCredential phoneAuthCredential) {
@@ -193,7 +190,7 @@ public class VerifyNumber extends Fragment {
             }
 
             @Override
-            public void afterTextChanged(Editable editable) {
+            public void afterTextChanged(Editable editable) { //clicks verify button when user finish writing the opt code
                 if (binding.otpTextView.getText().toString().length() == 6)
                     binding.verifyButton.performClick();
             }
@@ -255,7 +252,7 @@ public class VerifyNumber extends Fragment {
                 });
     }
 
-    public static class SMSbroadcast extends BroadcastReceiver {
+    public static class SMSbroadcast extends BroadcastReceiver { //BroadcastReceiver for receiving SMS message
         private String SMS = "android.provider.Telephony.SMS_RECEIVED";
 
         @Override
@@ -266,14 +263,14 @@ public class VerifyNumber extends Fragment {
                 if (smsMessage != null) {
                     String sender = smsMessage.getDisplayOriginatingAddress();
                     String smsChunk = smsMessage.getDisplayMessageBody();
-                    Toast.makeText(context, smsChunk, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, smsChunk, Toast.LENGTH_SHORT).show(); //TODO: delete
                     String code = null;
-                    if (smsChunk.contains("textme")) {
-                        Toast.makeText(context, "hh", Toast.LENGTH_SHORT).show();
-                        code = smsChunk.substring(0, 6);
-                        otpTextViewPinView.setText(code);
+                    if (smsChunk.contains("textme")) { //check if the sms received is the opt code for our app
+                        Toast.makeText(context, "hh", Toast.LENGTH_SHORT).show(); //TODO: delete
+                        code = smsChunk.substring(0, 6); //save the opt only
+                        otpTextViewPinView.setText(code); //set the opt to its widget
                     }
-                    Toast.makeText(context, code, Toast.LENGTH_LONG).show();
+                    Toast.makeText(context, code, Toast.LENGTH_LONG).show(); //TODO: delete
                 }
             }
         }

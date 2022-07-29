@@ -9,19 +9,15 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.Toast;
-
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
-import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.Adapter.UserAdapter;
@@ -36,7 +32,6 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -53,7 +48,7 @@ public class Dashboard extends AppCompatActivity implements SearchView.OnQueryTe
 
     @Override
     public void onBackPressed() { //methode to deal with back button press
-        //Toast.makeText(this, "test", Toast.LENGTH_SHORT).show();
+        //Toast.makeText(this, "test", Toast.LENGTH_SHORT).show(); //TODO: delete
         if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
             getSupportFragmentManager().popBackStack();
             chatsViewModel.getItemsCount().observe(this, itemsNum -> { getSupportActionBar().setTitle("Messages (" + String.valueOf(itemsNum)+ ")"); });
@@ -80,13 +75,13 @@ public class Dashboard extends AppCompatActivity implements SearchView.OnQueryTe
         SearchView.SearchAutoComplete theTextArea = searchView.findViewById(androidx.appcompat.R.id.search_src_text);
         searchView.setOnQueryTextListener(this);
         theTextArea.setTextColor(getResources().getColor(R.color.white));
-//        theTextArea.setTextCursorDrawable(R.color.white);
+//        theTextArea.setTextCursorDrawable(R.color.white); //TODO: delete (?)
 //        theTextArea.setTextCursorDrawable(Drawable.createFromPath("@drawable/chat_cursor"));
 //        theTextArea.setCursorVisible(true);
         ImageView ivClose = searchView.findViewById(search_close_btn);
         ivClose.setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.white), android.graphics.PorterDuff.Mode.SRC_IN);
         utils = new Utils();
-        //chatsViewModel.getUserMutableLiveData().observe(this, userListUpdateObserver);
+        //chatsViewModel.getUserMutableLiveData().observe(this, userListUpdateObserver); //TODO: delete (?)
         context = this;
         ReadUsers(context); //call ReadUsers methode
     }
@@ -107,7 +102,7 @@ public class Dashboard extends AppCompatActivity implements SearchView.OnQueryTe
                             myID = user.getuID(); //else set myID string value
                         userAdapter = new UserAdapter(Dashboard.this, mUsers, chatsViewModel); //define adapter for the recycle view
                         recyclerView.setAdapter(userAdapter); //set adapter for recycle view
-                        chatsViewModel.getSelected().observe((LifecycleOwner) context, item -> {
+                        chatsViewModel.getSelected().observe((LifecycleOwner) context, item -> { //update the userAdapter about change in date and refresh the view
                             userAdapter.notifyDataSetChanged();
                         });
                     }
@@ -128,11 +123,11 @@ public class Dashboard extends AppCompatActivity implements SearchView.OnQueryTe
     public boolean onOptionsItemSelected(MenuItem item) { //define the menu functionality
         Fragment fragment;
         FragmentManager fragmentManager;
-        //findViewById(R.id.card).setVisibility(View.INVISIBLE);
+        //findViewById(R.id.card).setVisibility(View.INVISIBLE); //TODO: delete (?)
         switch (item.getItemId()) {
             case R.id.Exit:
                 finish(); // Close the app
-                //fragment = new Settings();
+                //fragment = new Settings(); //TODO: delete (?)
                 //fragmentManager = getSupportFragmentManager();
                 //fragmentManager.beginTransaction().replace(R.id.dashboardContainer, fragment).addToBackStack("BBB").commit();
                 break;
@@ -152,13 +147,13 @@ public class Dashboard extends AppCompatActivity implements SearchView.OnQueryTe
     }
 
     @Override
-    protected void onResume() {
+    protected void onResume() { //if user resume to the app update status to online
         utils.updateOnlineStatus("online");
         super.onResume();
     }
 
     @Override
-    protected void onPause() {
+    protected void onPause() { //if user pause the app set the last seen time to current time
         utils.updateOnlineStatus(String.valueOf(System.currentTimeMillis()));
         super.onPause();
     }

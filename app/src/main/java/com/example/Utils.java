@@ -7,18 +7,14 @@ import android.content.pm.PackageManager;
 import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
-
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import static java.time.temporal.ChronoUnit.MINUTES;
 import java.util.Calendar;
 import java.util.Date;
@@ -42,7 +38,7 @@ public class Utils {
         Date date = calendar.getTime();
         sdf().setTimeZone(TimeZone.getTimeZone("Asia/Jerusalem"));
         return sdf().format(date);
-        //return sdf().format(calendar.getTimeInMillis());
+        //return sdf().format(calendar.getTimeInMillis()); //TODO: delete (?)
         //calendar.setTimeZone(TimeZone.getTimeZone(timezone));
     }
 
@@ -74,7 +70,7 @@ public class Utils {
         }
     }
 
-    public static String getMessageDateTimeAgo(LocalDateTime localDateTime) { //return a string with the "last seen" time
+    public static String getMessageDateTimeAgo(LocalDateTime localDateTime) { //return a string with the "last seen" time TODO: delete (?)
         Log.e("test", java.time.LocalDateTime.now().toString());
         if (Math.abs(MINUTES.between(java.time.LocalDateTime.now(),localDateTime)) > 60 * 24 * 2) {
             DateFormat format2 = new SimpleDateFormat("EEEE");
@@ -91,12 +87,12 @@ public class Utils {
         return ContextCompat.checkSelfPermission(context, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
     }
 
-    public void requestStorage(Activity activity) { //request user permission to read data from external storage
+    public void requestStorage(Activity activity) { //request user permission to read data from external storage TODO: delete (?)
         ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE}, 2000);
     }
 
     public void updateOnlineStatus(String online) {
-        //if (!online.equals("online"))
+        //if (!online.equals("online")) TODO: delete (?)
         //    online = getTimeAgo(online);
         DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Users").child(FirebaseAuth.getInstance().getCurrentUser().getUid());
         HashMap<String, Object> map = new HashMap<>();

@@ -4,7 +4,7 @@ public class ChatModel {
 //chat POJO includes the data of a chat (sender,receiver,message etc).
     String sender, receiver, message, date, type;
 
-    public ChatModel() {
+    public ChatModel() { //TODO: delete (?)
     }
 
     public ChatModel(String sender, String receiver, String message, String date, String type) {
@@ -21,7 +21,7 @@ public class ChatModel {
 
     public void setSender(String sender) {
         this.sender = sender;
-    }
+    } //TODO: delete (?)
 
     public String getReceiver() {
         return receiver;
@@ -29,7 +29,7 @@ public class ChatModel {
 
     public void setReceiver(String receiver) {
         this.receiver = receiver;
-    }
+    } //TODO: delete (?)
 
     public String getMessage() { return message; }
 
@@ -41,7 +41,7 @@ public class ChatModel {
         return date;
     }
 
-    public void setDate(String date) { this.date = date; }
+    public void setDate(String date) { this.date = date; } //TODO: delete (?)
 
     public String getType() {
         return type;

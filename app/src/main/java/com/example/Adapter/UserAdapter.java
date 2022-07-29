@@ -10,17 +10,14 @@ import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.TextView;
-
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.example.ChatActivity;
 import com.example.ChatsViewModel;
 import com.example.Fragments.Profile;
-import com.example.Model.ChatListModel;
 import com.example.Model.UserModel;
 import com.example.project3.R;
 import com.google.firebase.auth.FirebaseAuth;
@@ -31,7 +28,6 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
-
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -47,9 +43,10 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> im
     private List<UserModel> mUsers, filterArrayList;
     private String lastMsg, date, myID = firebaseUser.getUid(), chatID;
     private ChatsViewModel chatsViewModel;
+
     private Filter contactFilter = new Filter() {
         @Override
-        protected FilterResults performFiltering(CharSequence constraint) {
+        protected FilterResults performFiltering(CharSequence constraint) { //initialize the list of users
             List<UserModel> filteredList = new ArrayList<>();
             if (constraint == null || constraint.length() == 0)
                 filteredList.addAll(filterArrayList);
@@ -96,35 +93,35 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> im
 
     @NonNull
     @Override
-    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) { //inflate a contact row for recycle view
         View view = LayoutInflater.from(context).inflate(R.layout.contact_item, parent, false);
         return new UserAdapter.ViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        UserModel users = mUsers.get(position);
-        //chatsViewModel.setItemsCount(3);
-        chatsViewModel.setItemsCount(mUsers.size());
-        //notifyDataSetChanged();
-        String username = users.getFirstName() + " " + users.getLastName();
-        holder.userName.setText(username);
-        getLastMessage(users, holder);
-        //holder.status.setText(lastMsg == null ? ("Status: " + users.getStatus()) : lastMsg);
-        if (!users.getImage().equals(""))
+        UserModel users = mUsers.get(position); //get user from mUsers list
+        //chatsViewModel.setItemsCount(3); //TODO: delete (?)
+        chatsViewModel.setItemsCount(mUsers.size()); //set the current number of registered users
+        //notifyDataSetChanged(); //TODO: delete (?)
+        String username = users.getFirstName() + " " + users.getLastName(); //create string with first and last name
+        holder.userName.setText(username); //set name to the row widget
+        getLastMessage(users, holder); //call method getLastMessage
+        //holder.status.setText(lastMsg == null ? ("Status: " + users.getStatus()) : lastMsg); //TODO: delete (?)
+        if (!users.getImage().equals("")) //load user image to row widget
             Picasso.get().load(users.getImage()).into(holder.userImage);
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
+        holder.itemView.setOnClickListener(new View.OnClickListener() { //listener for click on a contact row
             @Override
-            public void onClick(View view) {
+            public void onClick(View view) { //loads the chat with the contact clicked
                 Intent i = new Intent(context, ChatActivity.class);
                 i.putExtra("userID", users.getuID());
                 i.putExtra("chatID", chatID);
                 context.startActivity(i);
             }
         });
-        holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
+        holder.itemView.setOnLongClickListener(new View.OnLongClickListener() { //set long click listener for clicking contact row TODO: delete (?)
             @Override
-            public boolean onLongClick(View view) {
+            public boolean onLongClick(View view) { //open contact profile
                 chatsViewModel.setPosition(selectedPos);
                 if(selectedPos == holder.getAbsoluteAdapterPosition())
                     createChatFragment(users, R.id.dashboardContainer);
@@ -136,7 +133,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> im
                 return false;
             }
         });
-        holder.userImage.setOnClickListener(new View.OnClickListener() {
+        holder.userImage.setOnClickListener(new View.OnClickListener() { //TODO: delete (?)
             @Override
             public void onClick(View view) {
                 createChatFragment(users, R.id.dashboardContainer);
@@ -144,7 +141,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> im
         });
     }
 
-    public void createChatFragment(UserModel users, int container) {
+    public void createChatFragment(UserModel users, int container) { //create and load fragment with contact profile
         Fragment fragment;
         FragmentManager fragmentManager;
         fragment = new Profile();
@@ -157,11 +154,11 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> im
     }
 
     @Override
-    public int getItemCount() {
+    public int getItemCount() { //return the number of objects of type UserModel in the list mUsers
         return mUsers.size();
     }
 
-    private void getLastMessage(UserModel user, ViewHolder holder) {
+    private void getLastMessage(UserModel user, ViewHolder holder) { //get the last message and the time its sent
         lastMsg = date = chatID = null;
         DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("ChatList").child(myID);
         databaseReference.addValueEventListener(new ValueEventListener() {
@@ -172,13 +169,13 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> im
                         lastMsg = dataSnapshot.child("lastMessage").getValue().toString();
                         chatID = dataSnapshot.child("chatListID").getValue().toString();
                         LocalDateTime localTime = LocalDateTime.parse(dataSnapshot.child("date").getValue().toString(), DateTimeFormatter.ofPattern("dd/MM/yyyy HH-mm-ss"));
-                        //date = Utils.getMessageDateTimeAgo(localDateTime);
+                        //date = Utils.getMessageDateTimeAgo(localDateTime); //TODO: delete (?)
                         date = String.format(Locale.FRENCH,"%02d:%02d", localTime.getHour(), localTime.getMinute());
                         break;
                     }
                 }
-                holder.status.setText(lastMsg == null ? ("Status: " + user.getStatus()) : lastMsg);
-                holder.dateTextView.setText(lastMsg == null ? "" : date);
+                holder.status.setText(lastMsg == null ? ("Status: " + user.getStatus()) : lastMsg); //update contact row with the last message sent in the chat with him (default: if chat empty show contact status sentence)
+                holder.dateTextView.setText(lastMsg == null ? "" : date); //update last received message timestamp in the contact row
                 lastMsg = date = chatID = null;
             }
             @Override

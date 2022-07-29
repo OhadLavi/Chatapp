@@ -2,23 +2,16 @@ package com.example.Adapter;
 
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Filter;
-import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.RecyclerView;
-
-import com.example.ChatActivity;
 import com.example.Model.ChatModel;
-import com.example.Model.UserModel;
 import com.example.Utils;
 import com.example.project3.R;
 import com.google.firebase.auth.FirebaseAuth;
@@ -29,12 +22,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
-import com.squareup.picasso.Picasso;
-
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -64,7 +53,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ChatAdapter.ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull ChatAdapter.ViewHolder holder, int position) { //set timestamp to last message sent
         ChatModel chat = mChat.get(position);
         holder.showMessage.setText(chat.getMessage());
         DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH-mm-ss", Locale.FRENCH);
@@ -77,9 +66,9 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
             Toast.makeText(context, "Error setting message times", Toast.LENGTH_SHORT).show();
         }
 
-        holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
+        holder.itemView.setOnLongClickListener(new View.OnLongClickListener() { //long click listener for delete message
             @Override
-            public boolean onLongClick(View view) {
+            public boolean onLongClick(View view) { //ask user if he want to delete the clicked message and remove it form fire base (or cancel the process)
                 AlertDialog.Builder builder1 = new AlertDialog.Builder(context);
                 builder1.setMessage("Do you want to delete this message?");
                 builder1.setCancelable(true);
@@ -110,7 +99,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
     }
 
     @Override
-    public int getItemCount() {
+    public int getItemCount() { //return the number of objects of type ChatModel in the list mChat
         return mChat.size();
     }
 
@@ -127,7 +116,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
     }
 
     @Override
-    public int getItemViewType(int position) {
+    public int getItemViewType(int position) { //return value of 1 (right bubble) if the message sent by the current logged in user and 0 otherwise
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         return mChat.get(position).getSender().equals(firebaseUser.getUid()) ? MSG_TYPE_RIGHT : MSG_TYPE_LEFT;
     }

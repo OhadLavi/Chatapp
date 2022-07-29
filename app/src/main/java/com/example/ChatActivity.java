@@ -4,26 +4,21 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
-
 import com.example.Adapter.ChatAdapter;
 import com.example.Adapter.UserAdapter;
 import com.example.Model.ChatListModel;
 import com.example.Model.ChatModel;
 import com.example.project3.R;
-
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.example.Model.UserModel;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -34,7 +29,6 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -79,7 +73,7 @@ public class ChatActivity extends AppCompatActivity {
         Intent intent = getIntent(); //return the intent that started the activity
         findViewById(R.id.msgBack).setOnClickListener(view -> finish()); //listener for back button click, close the current activity and back to the activity that was before it called
 
-        //if (getIntent().getData() != null)
+        //if (getIntent().getData() != null) //TODO: delete (?)
         userID = intent.getStringExtra("userID"); //get the user id
 
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser(); //get current logged in user
@@ -119,7 +113,7 @@ public class ChatActivity extends AppCompatActivity {
                         checkChat(friendID);
                     }
                 }
-                //checkChat(friendID); //call checkChat method that find the chat of current logged in user and his friend and load the message history from it
+                //checkChat(friendID); //call checkChat method that find the chat of current logged in user and his friend and load the message history from it //TODO: delete (?)
             }
 
             @Override
@@ -155,7 +149,7 @@ public class ChatActivity extends AppCompatActivity {
             Map<String, Object> update = new HashMap<>();
             update.put("lastMessage", message);
             update.put("date", date);
-            Toast.makeText(context, date, Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, date, Toast.LENGTH_SHORT).show(); //TODO: delete
             //update in fire base both current user chat history and friend chat history with the last message
             databaseReference = FirebaseDatabase.getInstance().getReference("ChatList").child(myID).child(chatID);
             databaseReference.updateChildren(update);

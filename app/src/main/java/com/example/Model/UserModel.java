@@ -1,22 +1,18 @@
 package com.example.Model;
 
 import android.widget.ImageView;
-
 import androidx.annotation.NonNull;
 import androidx.databinding.BindingAdapter;
-
 import com.squareup.picasso.Picasso;
-
 import java.util.HashMap;
 import java.util.Map;
-
 import de.hdodenhof.circleimageview.CircleImageView;
 
 //user POJO includes the data of a user (name,picture,number etc).
 public class UserModel {
     String firstName, lastName, image, number, uID, online, status;
 
-    public UserModel() {
+    public UserModel() { //TODO: delete (?)
     }
 
     public UserModel(String firstName, String lastName, String image, String number, String uID, String online, String typing, String status, String token) {
@@ -31,11 +27,11 @@ public class UserModel {
 
     @BindingAdapter("bind:imageUrl")
     public static void loadImage(@NonNull CircleImageView view, @NonNull String image) {
-        //Glide.with(view.getContext()).load(image).into(view);
+        //Glide.with(view.getContext()).load(image).into(view); //TODO: delete (?)
         Picasso.get().load(image).into(view);
     }
 
-    @BindingAdapter("bind:imageChat")
+    @BindingAdapter("bind:imageChat") //TODO: delete (?)
     public static void loadImage(@NonNull ImageView view, @NonNull String image) {
         Picasso.get().load(image).into(view);
     }
@@ -46,7 +42,7 @@ public class UserModel {
 
     public void setOnline(String online) {
         this.online = online;
-    }
+    } //TODO: delete (?)
 
     public String getFirstName() {
         return firstName;
@@ -86,7 +82,7 @@ public class UserModel {
 
     public void setuID(String uID) {
         this.uID = uID;
-    }
+    } //TODO: delete (?)
 
     public String getStatus() { return status; }
 

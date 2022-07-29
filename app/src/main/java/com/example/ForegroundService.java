@@ -9,12 +9,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.IBinder;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
-
 import com.example.project3.R;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -28,7 +26,7 @@ public class ForegroundService extends Service {
     public static final String CHANNEL_ID_2 = "NotificationChannel";
 
     FirebaseAuth auth;
-    Notification notification1, notification2;
+    Notification notification1, notification2; //TODO: delete notification1
     Context context;
     PendingIntent pendingIntent;
     private long numberOfUsers;
@@ -103,13 +101,13 @@ public class ForegroundService extends Service {
         }
     }
 
-    public void startService(String value) {
+    public void startService(String value) { //TODO: delete (?)
         Intent serviceIntent = new Intent(this, ForegroundService.class);
         serviceIntent.putExtra("inputExtra", value);
         ContextCompat.startForegroundService(this, serviceIntent);
     }
 
-    public void stopService() {
+    public void stopService() { //TODO: delete (?)
         Intent serviceIntent = new Intent(this, ForegroundService.class);
         stopService(serviceIntent);
     }
