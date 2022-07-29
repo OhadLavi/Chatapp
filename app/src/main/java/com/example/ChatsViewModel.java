@@ -4,15 +4,10 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import com.example.Model.ChatListModel;
-import com.example.Model.UserModel;
-
-import java.util.ArrayList;
-
-public class ChatsViewModel extends ViewModel {
+public class ChatsViewModel extends ViewModel { //TODO: move class to Model directory
 
     private final MutableLiveData<Integer> itemSelected; //position observer
-    private MutableLiveData <Integer> itemsCount;
+    private MutableLiveData <Integer> itemsCount; //number of contacts observer
 
     public ChatsViewModel() {
         itemSelected = new MutableLiveData<Integer>(-1);
@@ -24,7 +19,7 @@ public class ChatsViewModel extends ViewModel {
 
     public MutableLiveData<Integer> getItemSelected() {
         return itemSelected;
-    }
+    } //TODO: delete (?)
 
     public void setPosition(Integer item) {
         itemSelected.setValue(item);

@@ -5,7 +5,7 @@ public class ChatListModel {
     // Chat list POJO includes the data of a chat (Chat's id, last message and its date and to whom).
     String chatListID, date, lastMessage, member;
 
-    public ChatListModel() {
+    public ChatListModel() { //TODO: delete (?)
     }
 
     public ChatListModel(String chatListID, String date, String lastMessage, String member) {
@@ -14,7 +14,7 @@ public class ChatListModel {
         this.lastMessage = lastMessage;
         this.member = member;
     }
-
+    //TODO: delete (?)
     public String getChatListID() {
         return chatListID;
     }

@@ -7,12 +7,10 @@ import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
-
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
 import com.example.Utils;
 import com.example.project3.R;
 import com.example.project3.databinding.FragmentGetNumberBinding;
@@ -21,9 +19,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.PhoneAuthCredential;
 import com.google.firebase.auth.PhoneAuthOptions;
 import com.google.firebase.auth.PhoneAuthProvider;
-
 import android.widget.Toast;
-
 import java.util.concurrent.TimeUnit;
 
 public class GetNumber extends Fragment {
@@ -74,7 +70,7 @@ public class GetNumber extends Fragment {
         view.findViewById(R.id.phoneNum).setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View view, boolean hasFocus) {
-                //if(!hasFocus) utils.hideKeyBoard(getActivity());
+                //if(!hasFocus) utils.hideKeyBoard(getActivity()); //TODO: delete (?)
             }
         });
         return view;

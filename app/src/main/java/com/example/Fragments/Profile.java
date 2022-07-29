@@ -2,7 +2,6 @@ package com.example.Fragments;
 
 import android.Manifest;
 import android.app.Activity;
-import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -19,7 +18,6 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
@@ -28,7 +26,6 @@ import androidx.appcompat.view.ContextThemeWrapper;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
-
 import com.example.Adapter.UserAdapter;
 import com.example.ChatActivity;
 import com.example.Model.UserModel;
@@ -46,7 +43,6 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.squareup.picasso.Picasso;
-
 import java.util.Map;
 import java.util.Objects;
 
@@ -81,7 +77,7 @@ public class Profile extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+                             Bundle savedInstanceState) { //TODO: delete (?)
 //        ActionBar toolbar = ((AppCompatActivity) getActivity()).getSupportActionBar();
 //        getActivity().setTheme(R.style.AppBarOverlay);
 //        toolbar.getThemedContext().setTheme(R.style.AppBarOverlay);
@@ -130,7 +126,8 @@ public class Profile extends Fragment {
         uploadPhoto.setVisibility(View.GONE);
         doneEditProfileImage.setVisibility(View.GONE);
         clearConversation = view.findViewById(R.id.clearConversation);
-        clearConversation.setOnClickListener(new View.OnClickListener() {
+
+        clearConversation.setOnClickListener(new View.OnClickListener() { //listener for clicking the clear conversation button
             @Override
             public void onClick(View view) {
 
@@ -191,7 +188,7 @@ public class Profile extends Fragment {
             }
 
         });
-        editProfileImage.setOnClickListener(new View.OnClickListener() {
+        editProfileImage.setOnClickListener(new View.OnClickListener() { //listener for clicking the profile image (if user want change his image)
             @Override
             public void onClick(View view) {
                 editProfileImage.setVisibility(View.GONE);
@@ -206,7 +203,8 @@ public class Profile extends Fragment {
                 profileFirstNameEditText.setTextAppearance(R.style.EditTextStyleEdited);
                 profileLastNameEditText.setTextAppearance(R.style.EditTextStyleEdited);
                 profileStatusEditText.setTextAppearance(R.style.EditTextStyleEdited);
-                uploadPhoto.setOnClickListener(new View.OnClickListener() {
+
+                uploadPhoto.setOnClickListener(new View.OnClickListener() { //listener for clicking the upload photo
                     @Override
                     public void onClick(View view) {
                         if (utils.isStorageOk(getContext()))
@@ -218,7 +216,7 @@ public class Profile extends Fragment {
             }
         });
 
-        doneEditProfileImage.setOnClickListener(new View.OnClickListener() {
+        doneEditProfileImage.setOnClickListener(new View.OnClickListener() { //listener for clicking the done editing button
             @Override
             public void onClick(View view) {
                 profileFirstNameEditText.setInputType(InputType.TYPE_NULL);
@@ -284,7 +282,7 @@ public class Profile extends Fragment {
         return view;
     }
 
-    private void checkPermissions(String permission) {
+    private void checkPermissions(String permission) { //check if SMS permission generated
         if (ContextCompat.checkSelfPermission(getContext(), permission) == PackageManager.PERMISSION_GRANTED) {
         } else if (ActivityCompat.shouldShowRequestPermissionRationale(getActivity(), permission))
             Toast.makeText(getActivity(), "You must grant SMS permission", Toast.LENGTH_LONG).show();
@@ -292,7 +290,7 @@ public class Profile extends Fragment {
             requestPermissionLauncher.launch(permission);
     }
 
-    private void updateData() {
+    private void updateData() { //upload users date to fire base
         user.setFirstName(profileFirstNameEditText.getText().toString());
         user.setLastName(profileLastNameEditText.getText().toString());
         user.setStatus(profileStatusEditText.getText().toString());
@@ -364,7 +362,7 @@ public class Profile extends Fragment {
                         String d = null;
                         Picasso.get().load(sharedPreferences.getString("userImage", d)).into(imgProfile);
                         Picasso.get().load(sharedPreferences.getString("userImage", d)).fit().into(profileImage);
-                        //Toast.makeText(getContext(), sharedPreferences.getString("userImage", d), Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(getContext(), sharedPreferences.getString("userImage", d), Toast.LENGTH_SHORT).show(); //TODO: delete
                     }
                 }
             }
