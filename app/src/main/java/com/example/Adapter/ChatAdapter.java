@@ -58,7 +58,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
 
     @NonNull
     @Override
-    public ChatAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public ChatAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) { //inflate right/left chat bubble row according viewType received value
         int resource = viewType == MSG_TYPE_RIGHT ? R.layout.right_bubble_layout : R.layout.left_bubble_layout;
         return new ChatAdapter.ViewHolder(LayoutInflater.from(context).inflate(resource, parent, false));
     }
