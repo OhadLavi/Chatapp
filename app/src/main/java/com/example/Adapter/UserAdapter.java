@@ -10,7 +10,6 @@ import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -19,9 +18,10 @@ import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.ChatActivity;
+import com.example.ChatsViewModel;
 import com.example.Fragments.Profile;
+import com.example.Model.ChatListModel;
 import com.example.Model.UserModel;
-import com.example.Utils;
 import com.example.project3.R;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -29,27 +29,24 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
 public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> implements Filterable {
 
     private final FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+    private int selectedPos = RecyclerView.NO_POSITION;
     private Context context;
     private List<UserModel> mUsers, filterArrayList;
     private String lastMsg, date, myID = firebaseUser.getUid(), chatID;
+    private ChatsViewModel chatsViewModel;
     private Filter contactFilter = new Filter() {
         @Override
         protected FilterResults performFiltering(CharSequence constraint) {
@@ -77,9 +74,14 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> im
         }
     };
 
-    public UserAdapter(Context context, List<UserModel> mUsers) {
+    public UserAdapter(Context context, List<UserModel> mUsers, ChatsViewModel chatsViewModel) {
         this.context = context;
         this.mUsers = mUsers;
+        this.chatsViewModel = chatsViewModel;
+        if (this.chatsViewModel.getSelected().getValue() != null) {
+            selectedPos = this.chatsViewModel.getSelected().getValue();
+            notifyItemChanged(selectedPos);
+        }
         filterArrayList = new ArrayList<>();
         filterArrayList.addAll(mUsers);
     }
@@ -102,6 +104,9 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> im
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         UserModel users = mUsers.get(position);
+        //chatsViewModel.setItemsCount(3);
+        chatsViewModel.setItemsCount(mUsers.size());
+        //notifyDataSetChanged();
         String username = users.getFirstName() + " " + users.getLastName();
         holder.userName.setText(username);
         getLastMessage(users, holder);
@@ -115,6 +120,20 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> im
                 i.putExtra("userID", users.getuID());
                 i.putExtra("chatID", chatID);
                 context.startActivity(i);
+            }
+        });
+        holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                chatsViewModel.setPosition(selectedPos);
+                if(selectedPos == holder.getAbsoluteAdapterPosition())
+                    createChatFragment(users, R.id.dashboardContainer);
+                if(selectedPos > holder.getAbsoluteAdapterPosition())
+                    selectedPos -= 1;
+                chatsViewModel.setPosition(selectedPos);
+                notifyItemChanged(selectedPos);
+                notifyDataSetChanged();
+                return false;
             }
         });
         holder.userImage.setOnClickListener(new View.OnClickListener() {
@@ -152,7 +171,8 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> im
                     if (dataSnapshot.child("member").getValue() != null && dataSnapshot.child("member").getValue().toString().equals(user.getuID())) {
                         lastMsg = dataSnapshot.child("lastMessage").getValue().toString();
                         chatID = dataSnapshot.child("chatListID").getValue().toString();
-                        LocalTime localTime = LocalTime.parse(dataSnapshot.child("date").getValue().toString(), DateTimeFormatter.ofPattern("dd/MM/yyyy HH-mm-ss"));
+                        LocalDateTime localTime = LocalDateTime.parse(dataSnapshot.child("date").getValue().toString(), DateTimeFormatter.ofPattern("dd/MM/yyyy HH-mm-ss"));
+                        //date = Utils.getMessageDateTimeAgo(localDateTime);
                         date = String.format(Locale.FRENCH,"%02d:%02d", localTime.getHour(), localTime.getMinute());
                         break;
                     }

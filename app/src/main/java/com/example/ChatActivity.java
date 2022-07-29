@@ -141,22 +141,23 @@ public class ChatActivity extends AppCompatActivity {
         if (chatID == null) {
             createChat(message);
         }
-//        else {
-//            date =  utils.currentDate(); //get the date of today
-//            ChatModel messageModel = new ChatModel(myID, friendID, message, date, ""); //create new instance of a message according the ChatModel and initialize the fields: sender, receiver, message, date, type
-//            databaseReference = FirebaseDatabase.getInstance().getReference("Chat").child(chatID); //get reference to fire base specific chat according its id
-//            databaseReference.push().setValue(messageModel); //add the new message to the fire base specific chat
-//
-//            //crate new map object with the last message sent and its date
-//            Map<String, Object> update = new HashMap<>();
-//            update.put("lastMessage", message);
-//            update.put("date", date);
-//            //update in fire base both current user chat history and friend chat history with the last message
-//            databaseReference = FirebaseDatabase.getInstance().getReference("ChatList").child(myID).child(chatID);
-//            databaseReference.updateChildren(update);
-//            databaseReference = FirebaseDatabase.getInstance().getReference("ChatList").child(friendID).child(chatID);
-//            databaseReference.updateChildren(update);
-//       }
+        else {
+            date =  utils.currentDate(); //get the date of today
+            ChatModel messageModel = new ChatModel(myID, friendID, message, date, ""); //create new instance of a message according the ChatModel and initialize the fields: sender, receiver, message, date, type
+            databaseReference = FirebaseDatabase.getInstance().getReference("Chat").child(chatID); //get reference to fire base specific chat according its id
+            databaseReference.push().setValue(messageModel); //add the new message to the fire base specific chat
+
+            //crate new map object with the last message sent and its date
+            Map<String, Object> update = new HashMap<>();
+            update.put("lastMessage", message);
+            update.put("date", date);
+            Toast.makeText(context, date, Toast.LENGTH_SHORT).show();
+            //update in fire base both current user chat history and friend chat history with the last message
+            databaseReference = FirebaseDatabase.getInstance().getReference("ChatList").child(myID).child(chatID);
+            databaseReference.updateChildren(update);
+            databaseReference = FirebaseDatabase.getInstance().getReference("ChatList").child(friendID).child(chatID);
+            databaseReference.updateChildren(update);
+       }
     }
 
     private void readMessages(String chatID) { //method for read messages
@@ -208,8 +209,6 @@ public class ChatActivity extends AppCompatActivity {
         chatID = databaseReference.push().getKey();
         ChatListModel chatListModel = new ChatListModel(chatID, utils.currentDate(), msg, friendID);
         databaseReference.child(chatID).setValue(chatListModel);
-        Toast.makeText(context, chatID, Toast.LENGTH_SHORT).show();
-        Toast.makeText(context, friendID, Toast.LENGTH_SHORT).show();
         databaseReference = FirebaseDatabase.getInstance().getReference("ChatList").child(friendID);
         ChatListModel chatList = new ChatListModel(chatID, utils.currentDate(), msg, myID);
         databaseReference.child(chatID).setValue(chatList);

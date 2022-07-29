@@ -2,6 +2,7 @@ package com.example;
 
 import static androidx.appcompat.R.id.search_close_btn;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.text.Html;
 import android.view.Menu;
@@ -13,13 +14,19 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
+import androidx.lifecycle.LifecycleOwner;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.Adapter.UserAdapter;
 import com.example.Fragments.Profile;
+import com.example.Model.ChatListModel;
 import com.example.Model.UserModel;
 import com.example.project3.R;
 import com.google.firebase.auth.FirebaseAuth;
@@ -33,19 +40,23 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Dashboard extends AppCompatActivity implements SearchView.OnQueryTextListener {
+public class Dashboard extends AppCompatActivity implements SearchView.OnQueryTextListener, LifecycleOwner {
 
+    private Observer<ArrayList<ChatListModel>> userListUpdateObserver;
+    private ChatsViewModel chatsViewModel;
     private RecyclerView recyclerView;
     private UserAdapter userAdapter;
     private List<UserModel> mUsers;
     private String myID;
     private Utils utils;
+    private Context context;
+
     @Override
     public void onBackPressed() { //methode to deal with back button press
         //Toast.makeText(this, "test", Toast.LENGTH_SHORT).show();
         if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
             getSupportFragmentManager().popBackStack();
-            getSupportActionBar().setTitle("Messages");
+            chatsViewModel.getItemsCount().observe(this, itemsNum -> { getSupportActionBar().setTitle("Messages (" + String.valueOf(itemsNum)+ ")"); });
             findViewById(R.id.card).setVisibility(View.VISIBLE);
         } else {
             super.onBackPressed();
@@ -56,6 +67,8 @@ public class Dashboard extends AppCompatActivity implements SearchView.OnQueryTe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dashboard); //load the activity_dashboard.xml as view
+        chatsViewModel = new ViewModelProvider(this).get(ChatsViewModel.class);
+        chatsViewModel.getItemsCount().observe(this, itemsNum -> { getSupportActionBar().setTitle("Messages (" + String.valueOf(itemsNum)+ ")"); });
         getSupportActionBar().setTitle("Messages"); //change action bar title and preferences
         getSupportActionBar().setElevation(0);
         getSupportActionBar().setTitle(Html.fromHtml("<big><font color=\"white\">Messages</big>", Html.FROM_HTML_MODE_LEGACY));
@@ -73,10 +86,12 @@ public class Dashboard extends AppCompatActivity implements SearchView.OnQueryTe
         ImageView ivClose = searchView.findViewById(search_close_btn);
         ivClose.setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.white), android.graphics.PorterDuff.Mode.SRC_IN);
         utils = new Utils();
-        ReadUsers(); //call ReadUsers methode
+        //chatsViewModel.getUserMutableLiveData().observe(this, userListUpdateObserver);
+        context = this;
+        ReadUsers(context); //call ReadUsers methode
     }
 
-    private void ReadUsers() {
+    private void ReadUsers(Context context) {
         final FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser(); //get the current connected user from FireBase
         DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Users"); //get reference to users saved in FireBase
         databaseReference.addValueEventListener(new ValueEventListener() {
@@ -85,13 +100,17 @@ public class Dashboard extends AppCompatActivity implements SearchView.OnQueryTe
                 mUsers.clear(); //initialize the list of the users
                 for(DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     UserModel user = snapshot.getValue(UserModel.class); //save user data from FireBase in a pattern of UserModel POJO
-                    assert user != null;
-                    if (!user.getuID().equals(firebaseUser.getUid())) //if the user id is different then current connected user
-                        mUsers.add(user); //add user to the list
-                    else
-                        myID = user.getuID(); //else set myID string value
-                    userAdapter = new UserAdapter(Dashboard.this, mUsers); //define adapter for the recycle view
-                    recyclerView.setAdapter(userAdapter); //set adapter for recycle view
+                    if (user.getuID() != null) {
+                        if (!user.getuID().equals(firebaseUser.getUid())) //if the user id is different then current connected user
+                            mUsers.add(user); //add user to the list
+                        else
+                            myID = user.getuID(); //else set myID string value
+                        userAdapter = new UserAdapter(Dashboard.this, mUsers, chatsViewModel); //define adapter for the recycle view
+                        recyclerView.setAdapter(userAdapter); //set adapter for recycle view
+                        chatsViewModel.getSelected().observe((LifecycleOwner) context, item -> {
+                            userAdapter.notifyDataSetChanged();
+                        });
+                    }
                 }
             }
             @Override

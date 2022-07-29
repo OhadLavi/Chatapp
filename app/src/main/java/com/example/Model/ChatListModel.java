@@ -2,20 +2,18 @@ package com.example.Model;
 
 public class ChatListModel {
 
-    //chat POJO includes the data of a chat (sender,receiver,message etc).
+    // Chat list POJO includes the data of a chat (Chat's id, last message and its date and to whom).
     String chatListID, date, lastMessage, member;
 
     public ChatListModel() {
     }
 
-
-    public ChatListModel(String chatListID, String data, String lastMessage, String member) {
+    public ChatListModel(String chatListID, String date, String lastMessage, String member) {
         this.chatListID = chatListID;
-        this.date = data;
+        this.date = date;
         this.lastMessage = lastMessage;
         this.member = member;
     }
-
 
     public String getChatListID() {
         return chatListID;

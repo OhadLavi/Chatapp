@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 
@@ -14,7 +15,11 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import static java.time.temporal.ChronoUnit.MINUTES;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -67,6 +72,19 @@ public class Utils {
         } else {
             return diff / DAY_MILLIS + " days ago";
         }
+    }
+
+    public static String getMessageDateTimeAgo(LocalDateTime localDateTime) { //return a string with the "last seen" time
+        Log.e("test", java.time.LocalDateTime.now().toString());
+        if (Math.abs(MINUTES.between(java.time.LocalDateTime.now(),localDateTime)) > 60 * 24 * 2) {
+            DateFormat format2 = new SimpleDateFormat("EEEE");
+            String day = format2.format(localDateTime);
+            return day;
+        }
+        else if (MINUTES.between(java.time.LocalDateTime.now(),localDateTime) > 60 * 24 * 2)
+            return "yesterday";
+        else
+            return String.format(Locale.FRENCH,"%02d:%02d", localDateTime.getHour(), localDateTime.getMinute());
     }
 
     public boolean isStorageOk(Context context) { //return true if there is permission to read data from external storage

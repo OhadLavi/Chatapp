@@ -19,6 +19,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.ChatActivity;
 import com.example.Model.ChatModel;
 import com.example.Model.UserModel;
+import com.example.Utils;
 import com.example.project3.R;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -69,7 +70,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
         DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH-mm-ss", Locale.FRENCH);
         Date date = null;
         try {
-            date = (Date) formatter.parse(chat.getDate());
+            date = (Date) Utils.sdf().parse(chat.getDate());
             SimpleDateFormat sdf = new SimpleDateFormat("HH:mm", Locale.FRENCH);
             holder.messageDate.setText(sdf.format(date));
         } catch(Exception e) {

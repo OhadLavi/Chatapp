@@ -155,7 +155,6 @@ public class Profile extends Fragment {
                                                     String id = snapshot.child("member").getValue().toString();
                                                     if (id.equals(user.getuID())) {
                                                         chatID = snapshot.getKey();
-
                                                         snapshot.getRef().removeValue();
                                                         FirebaseDatabase.getInstance().getReference("ChatList").child(user.getuID()).child(chatID).removeValue();
                                                         FirebaseDatabase.getInstance().getReference("Chat").child(chatID).removeValue();
