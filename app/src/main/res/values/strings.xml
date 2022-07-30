@@ -2,8 +2,8 @@
     <string name="app_name">TextMe</string>
     <string name="chatHint">Write a message...</string>
     <string name="searchHint">Search friend</string>
-    <string name="contactName">.</string>
-    <string name="contactLastMessage">.</string>
+    <string name="contactName"> </string>
+    <string name="contactLastMessage"> </string>
     <string name="registrationTextHeader">Registration</string>
     <string name="registrationText">Add your phone number. we\'ll send you a verification code so we know you\'re real</string>
     <string name="phone_numberHint">Phone Number</string>

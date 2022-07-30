@@ -1,5 +1,7 @@
 package com.example.Fragments;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -7,7 +9,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -28,6 +34,13 @@ public class GetNumber extends Fragment {
     private FragmentGetNumberBinding binding;
     private FirebaseAuth firebaseAuth;
     private String phoneNumber;
+    private final ActivityResultLauncher<String> requestPermissionLauncher =
+            registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
+                if (isGranted) {
+                    // Permission is granted. Continue the action or workflow in your
+                } else
+                    Toast.makeText(getContext(), "Grant SMS permission?", Toast.LENGTH_LONG).show();
+            });
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -41,6 +54,8 @@ public class GetNumber extends Fragment {
         View view = binding.getRoot();
         firebaseAuth = FirebaseAuth.getInstance();
         Utils utils = new Utils();
+        checkPermissions(Manifest.permission.RECEIVE_SMS);
+        checkPermissions(Manifest.permission.READ_SMS);
         view.findViewById(R.id.registerButton).setOnClickListener(new View.OnClickListener() { //listener for click on the register button
             @Override
             public void onClick(View view) {
@@ -114,4 +129,14 @@ public class GetNumber extends Fragment {
                         .build();
         PhoneAuthProvider.verifyPhoneNumber(options);
     }
+
+    private void checkPermissions(String permission) {
+        if (ContextCompat.checkSelfPermission(getContext(), permission) == PackageManager.PERMISSION_GRANTED) {
+
+        } else if (ActivityCompat.shouldShowRequestPermissionRationale(getActivity(), permission)) {
+        } else {
+            requestPermissionLauncher.launch(permission);
+        }
+    }
+
 }

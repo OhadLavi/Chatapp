@@ -61,6 +61,7 @@ public class Dashboard extends AppCompatActivity implements SearchView.OnQueryTe
         } else {
             super.onBackPressed();
         }
+        recyclerView.setVisibility(View.VISIBLE);
     }
 
     @Override

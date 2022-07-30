@@ -88,8 +88,10 @@ public class Profile extends Fragment {
         utils = new Utils();
         storagePath = firebaseAuth.getUid() + "Media/Profile_Image/profile"; //get user profile image path
         sharedPreferences = getContext().getSharedPreferences("UserData", Context.MODE_PRIVATE);
-        if (getActivity().findViewById(R.id.card) != null)
+        if (getActivity().findViewById(R.id.card) != null) {
             getActivity().findViewById(R.id.card).setVisibility(View.GONE);
+            getActivity().findViewById(R.id.recyclerViewContact).setVisibility(View.GONE);
+        }
         profileName = view.findViewById(R.id.profileName);
         profilePhoneNumber = view.findViewById(R.id.profilePhoneNumber);
         profileLastSeen = view.findViewById(R.id.profileLastSeen);

@@ -9,6 +9,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.IBinder;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -24,16 +25,17 @@ import com.google.firebase.database.ValueEventListener;
 
 public class ForegroundService extends Service {
 
-    public static final String CHANNEL_ID_1 = "NotificationChannel";
-    private FirebaseAuth auth;
-    private Notification notification1;
-    private Context context;
+    private static final String CHANNEL_ID_1 = "ForegroundServiceChannel";
+    private static final String CHANNEL_ID_2 ="NotificationChannel";
+    private Notification notification1, notification2;
     private long numberOfUsers;
-    private boolean isFirst = true;
+    private boolean isFirstLaunch = true;
 
     @Override
     public void onCreate() {
         super.onCreate();
+        createNotificationChannel_1();
+        createNotificationChannel_2();
         DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Users"); //get reference to users saved in FireBase
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -49,14 +51,14 @@ public class ForegroundService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        // When User clicks on new media notification , moves to Notification_reciever.
+        // If user click on the notification, switch to the notification handler
         Intent notificationIntent = new Intent(this, NotificationServiceHandler.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(this,
                 0, notificationIntent, 0);
-        createNotificationChannel_2();
-        auth = FirebaseAuth.getInstance();
-        context = this;
-        notification1 = new NotificationCompat.Builder(context, CHANNEL_ID_1)
+        notification1 = new NotificationCompat.Builder(this, CHANNEL_ID_1)
+                .setContentTitle("TextMe")
+                .build();
+        notification2 = new NotificationCompat.Builder(this, CHANNEL_ID_2)
                 .setContentTitle("TextMe")
                 .setContentText("New user joined our app, you can start to chat together!")
                 .setSmallIcon(R.drawable.ic_new_user)
@@ -69,7 +71,7 @@ public class ForegroundService extends Service {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (numberOfUsers < snapshot.getChildrenCount()) {
                     numberOfUsers = snapshot.getChildrenCount();
-                    startForeground(1, notification1);
+                    startForeground(2, notification2);
                 }
             }
 
@@ -78,25 +80,36 @@ public class ForegroundService extends Service {
             }
         });
 
-        if (isFirst) {
-            isFirst = false;
+        if (isFirstLaunch) {
+            isFirstLaunch = false;
             startForeground(1, notification1);
         }
 
         // Called from notification's receiver
-        //if (intent != null && intent.getAction() != null && intent.getAction().equals("STOP_ACTION"))
-        //    startForeground(1, notification1); //Clicking on the notification will restarts the service with "STOP_ACTION"
+        if (intent != null && intent.getAction() != null && intent.getAction().equals("STOP_ACTION"))
+            startForeground(1, notification1); //Clicking on the notification will restarts the service with "STOP_ACTION"
         return START_STICKY;
     }
 
-    private void createNotificationChannel_2() {
+    private void createNotificationChannel_1() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel serviceChannel = new NotificationChannel(
                     CHANNEL_ID_1,
                     "Foreground Service Channel",
                     NotificationManager.IMPORTANCE_DEFAULT
             );
-            stopForeground(false);
+            NotificationManager manager = getSystemService(NotificationManager.class);
+            manager.createNotificationChannel(serviceChannel);
+        }
+    }
+
+    private void createNotificationChannel_2() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel serviceChannel = new NotificationChannel(
+                    CHANNEL_ID_2,
+                    "Notification Channel",
+                    NotificationManager.IMPORTANCE_DEFAULT
+            );
             NotificationManager manager = getSystemService(NotificationManager.class);
             manager.createNotificationChannel(serviceChannel);
         }

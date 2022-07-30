@@ -49,18 +49,12 @@ import java.util.concurrent.TimeUnit;
 
 public class VerifyNumber extends Fragment {
     private static PinView otpTextViewPinView;
-    private final ActivityResultLauncher<String> requestPermissionLauncher =
-            registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
-                if (isGranted) {
-                    // Permission is granted. Continue the action or workflow in your
-                } else
-                    Toast.makeText(getContext(), "Grant SMS permission?", Toast.LENGTH_LONG).show();
-            });
     private FragmentVerifyNumberBinding binding;
     private FirebaseAuth firebaseAuth;
     private DatabaseReference databaseReference;
     private String OTPcode, phoneNumber;
     private TextView resendOTPcode, countDownTimer;
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -73,8 +67,6 @@ public class VerifyNumber extends Fragment {
         toolbar.setNavigationIcon(getResources().getDrawable(R.drawable.back_arrow));
         firebaseAuth = FirebaseAuth.getInstance(); //receive an instance to fire base
         databaseReference = FirebaseDatabase.getInstance().getReference("Users"); //get reference to users in fire base
-        checkPermissions(Manifest.permission.RECEIVE_SMS);
-        //checkPermissions(Manifest.permission.READ_SMS);
         //get bundle with the phone number and verification code from GetNumber fragment
         Bundle bundle = getArguments();
         if (bundle != null) {
@@ -151,15 +143,6 @@ public class VerifyNumber extends Fragment {
             }
         });
         return view;
-    }
-
-    // Todo - remove ?
-    private void checkPermissions(String permission) {
-        if (ContextCompat.checkSelfPermission(getContext(), permission) == PackageManager.PERMISSION_GRANTED) {
-        } else if (ActivityCompat.shouldShowRequestPermissionRationale(getActivity(), permission)) {
-        } else {
-            requestPermissionLauncher.launch(permission);
-        }
     }
 
     private boolean checkOTPcode(String s) { //return true if otp code length is 6

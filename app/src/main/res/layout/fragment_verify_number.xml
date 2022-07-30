@@ -93,9 +93,13 @@
                 style="@style/SpinKitView.Large.Circle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:foregroundGravity="center"
                 android:layout_gravity="center"
                 android:visibility="gone"
-                app:SpinKit_Color="@color/white" />
+                app:SpinKit_Color="@color/white"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                tools:layout_editor_absoluteY="10dp" />
 
             <LinearLayout
                 android:id="@+id/linearLayout2"
@@ -129,10 +133,10 @@
                     app:cursorWidth="2dp"
                     app:hideLineWhenFilled="true"
                     app:itemCount="6"
-                    app:itemHeight="55dp"
+                    app:itemHeight="40dp"
                     app:itemRadius="10dp"
-                    app:itemSpacing="7dp"
-                    app:itemWidth="52dp"
+                    app:itemSpacing="10dp"
+                    app:itemWidth="40dp"
                     app:lineColor="@color/pinViewLine"
                     app:lineWidth="2dp"
                     app:viewType="rectangle" />
