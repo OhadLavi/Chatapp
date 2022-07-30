@@ -9,11 +9,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.IBinder;
+import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 import com.example.project3.R;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -41,7 +44,6 @@ public class ForegroundService extends Service {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 numberOfUsers = snapshot.getChildrenCount();
             }
-
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
             }
@@ -50,21 +52,25 @@ public class ForegroundService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        // When User clicks on new media notification , moves to Notification_reciever.
+        Intent notificationIntent = new Intent(this, NotificationServiceHandler.class);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this,
+                0, notificationIntent, 0);
         createNotificationChannel_2();
         auth = FirebaseAuth.getInstance();
         context = this;
         notification2 = new NotificationCompat.Builder(context, CHANNEL_ID_2)
-                .setContentTitle("New user")
+                .setContentTitle("TextMe")
                 .setContentText("New user joined our app, you can start to chat together!")
-                .setSmallIcon(R.drawable.back_arrow)
+                .setSmallIcon(R.drawable.ic_new_user)
                 .setContentIntent(pendingIntent)
                 .setStyle(new NotificationCompat.BigTextStyle())
                 .build();
-        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Users").child(FirebaseAuth.getInstance().getUid());
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Users");
         databaseReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (numberOfUsers != snapshot.getChildrenCount()) {
+                if (numberOfUsers < snapshot.getChildrenCount()) {
                     numberOfUsers = snapshot.getChildrenCount();
                     startForeground(2, notification2);
                 }
@@ -74,7 +80,13 @@ public class ForegroundService extends Service {
             public void onCancelled(@NonNull DatabaseError error) {
             }
         });
-        return START_NOT_STICKY;
+
+        // called from notification reciever
+        if (intent.getAction() != null && intent.getAction().equals("STOP_ACTION")) {
+            //When user clicks on new media notifcation, Notification_Reciever restarts the service with "STOP_ACTION".
+            startForeground(2, notification2);
+        }
+        return START_STICKY;
     }
 
     @Override
