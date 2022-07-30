@@ -31,7 +31,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
-            android:text="Registration"
+            android:text="@string/registrationTextHeader"
             android:textColor="@color/white"
             android:textFontWeight="500"
             android:textSize="25sp"
@@ -46,7 +46,7 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="15dp"
             android:gravity="center"
-            android:text="Add your phone number. we'll send you a verification code so we know you're real"
+            android:text="@string/registrationText"
             android:textColor="@color/primary_text"
             android:textSize="14sp"
             app:layout_constraintBottom_toTopOf="@+id/linearLayout"
@@ -88,7 +88,7 @@
                     android:id="@+id/phoneNum"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Phone Number"
+                    android:hint="@string/phone_numberHint"
                     android:inputType="number" />
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -97,7 +97,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:background="@drawable/registration_button"
-                android:text="Send OTP"
+                android:text="@string/send_otp"
                 android:textColor="@color/white"
                 android:textAllCaps="false"
                 android:textSize="18sp" />

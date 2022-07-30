@@ -1,5 +1,35 @@
 <resources>
-    <string name="app_name">Project3</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="app_name">TextMe</string>
+    <string name="chatHint">Write a message...</string>
+    <string name="searchHint">Search friend</string>
+    <string name="contactName">.</string>
+    <string name="contactLastMessage">.</string>
+    <string name="registrationTextHeader">Registration</string>
+    <string name="registrationText">Add your phone number. we\'ll send you a verification code so we know you\'re real</string>
+    <string name="phone_numberHint">Phone Number</string>
+    <string name="send_otp">Send OTP</string>
+    <string name="Username">Username</string>
+    <string name="statusOrPhoneNumber">text</string>
+    <string name="statusProfile">status</string>
+    <string name="phone_noProfile">Phone no.</string>
+    <string name="statusDetailsProfile">test</string>
+    <string name="phoneNumberDetailsProfile">TextView</string>
+    <string name="clear_conversationProfile">Clear conversation</string>
+    <string name="add_imageRegister">Add image</string>
+    <string name="first_nameRegister">First Name</string>
+    <string name="last_nameRegister">Last Name</string>
+    <string name="statusRegister">Status</string>
+    <string name="doneRegister">Done</string>
+    <string name="verificationRegister">Verification</string>
+    <string name="verificationTextRegister">Enter your OTP code number</string>
+    <string name="didn_t_receive_the_codeRegister">Didn\'t receive the code?</string>
+    <string name="resend_new_codeRegister">Resend new code</string>
+    <string name="timerRegister">(Timer)</string>
+    <string name="verifyRegister">Verify</string>
+    <string name="textChat">text</string>
+    <string name="timeChat">00:00</string>
+    <string name="last_seen_onToolbar">Last seen on</string>
+    <string name="usernameToolbar">TextView</string>
+    <string name="textChatRight">text</string>
+    <string name="timeChatRight">00:00</string>
 </resources>

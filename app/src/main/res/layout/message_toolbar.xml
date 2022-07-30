@@ -71,7 +71,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="70dp"
                     android:layout_marginTop="5dp"
-                    android:text="TextView"
+                    android:text="@string/usernameToolbar"
                     android:textColor="@color/white"
                     android:textSize="18sp" />
 
@@ -82,7 +82,7 @@
 
                     android:layout_marginStart="70dp"
                     android:layout_marginTop="30dp"
-                    android:text="Last seen on" />
+                    android:text="@string/last_seen_onToolbar" />
             </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
             <ImageView

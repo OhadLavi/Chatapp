@@ -10,15 +10,17 @@ import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.TextView;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.RecyclerView;
+
 import com.example.ChatActivity;
-import com.example.ViewModel.ChatsViewModel;
 import com.example.Fragments.Profile;
 import com.example.Model.UserModel;
+import com.example.ViewModel.ChatsViewModel;
 import com.example.project3.R;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -28,6 +30,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
+
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -39,12 +42,16 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> im
 
     private final FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
     private int selectedPos = RecyclerView.NO_POSITION;
-    private Context context;
-    private List<UserModel> mUsers, filterArrayList;
-    private String lastMsg, date, myID = firebaseUser.getUid(), chatID;
-    private ChatsViewModel chatsViewModel;
+    private final Context context;
+    private final List<UserModel> mUsers;
+    private final List<UserModel> filterArrayList;
+    private String lastMsg;
+    private String date;
+    private final String myID = firebaseUser.getUid();
+    private String chatID;
+    private final ChatsViewModel chatsViewModel;
 
-    private Filter contactFilter = new Filter() {
+    private final Filter contactFilter = new Filter() {
         @Override
         protected FilterResults performFiltering(CharSequence constraint) { //initialize the list of users
             List<UserModel> filteredList = new ArrayList<>();
@@ -112,9 +119,9 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> im
             @Override
             public boolean onLongClick(View view) { //open contact profile
                 chatsViewModel.setPosition(selectedPos);
-                if(selectedPos == holder.getAbsoluteAdapterPosition())
+                if (selectedPos == holder.getAbsoluteAdapterPosition())
                     createProfileFragment(users, R.id.dashboardContainer);
-                if(selectedPos > holder.getAbsoluteAdapterPosition())
+                if (selectedPos > holder.getAbsoluteAdapterPosition())
                     selectedPos -= 1;
                 chatsViewModel.setPosition(selectedPos);
                 notifyItemChanged(selectedPos);
@@ -154,7 +161,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> im
                         chatID = dataSnapshot.child("chatListID").getValue().toString();
                         LocalDateTime localTime = LocalDateTime.parse(dataSnapshot.child("date").getValue().toString(), DateTimeFormatter.ofPattern("dd/MM/yyyy HH-mm-ss"));
                         //date = Utils.getMessageDateTimeAgo(localDateTime); //TODO: delete (?)
-                        date = String.format(Locale.FRENCH,"%02d:%02d", localTime.getHour(), localTime.getMinute());
+                        date = String.format(Locale.FRENCH, "%02d:%02d", localTime.getHour(), localTime.getMinute());
                         break;
                     }
                 }
@@ -162,13 +169,17 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> im
                 holder.dateTextView.setText(lastMsg == null ? "" : date); //update last received message timestamp in the contact row
                 lastMsg = date = chatID = null;
             }
+
             @Override
-            public void onCancelled(@NonNull DatabaseError error) { }
+            public void onCancelled(@NonNull DatabaseError error) {
+            }
         });
     }
 
     @Override
-    public Filter getFilter() { return contactFilter; }
+    public Filter getFilter() {
+        return contactFilter;
+    }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         public TextView userName, status, dateTextView;

@@ -13,6 +13,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.view.ContextThemeWrapper;
 import androidx.recyclerview.widget.RecyclerView;
+
 import com.example.Model.ChatModel;
 import com.example.Utils;
 import com.example.project3.R;
@@ -24,6 +25,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -31,13 +33,13 @@ import java.util.Locale;
 
 public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
 
-    private final String chatID, imageURL;
-    private Context context;
-    private List<ChatModel> mChat;
-    private FirebaseUser firebaseUser;
-    private DatabaseReference databaseReference;
     public static final int MSG_TYPE_LEFT = 0; //used to choose the chat bubble: 0 - left_bubble_layout.xml , 1 - right_bubble_layout.xml
     public static final int MSG_TYPE_RIGHT = 1;
+    private final String chatID, imageURL;
+    private final Context context;
+    private final List<ChatModel> mChat;
+    private FirebaseUser firebaseUser;
+    private DatabaseReference databaseReference;
 
     public ChatAdapter(Context context, List<ChatModel> mChat, String imageURL, String chatID) {
         this.context = context;
@@ -59,10 +61,10 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
         holder.showMessage.setText(chat.getMessage());
         Date date = null;
         try {
-            date = (Date) Utils.sdf().parse(chat.getDate());
+            date = Utils.sdf().parse(chat.getDate());
             SimpleDateFormat sdf = new SimpleDateFormat("HH:mm", Locale.FRENCH);
             holder.messageDate.setText(sdf.format(date));
-        } catch(Exception e) {
+        } catch (Exception e) {
             Log.e("Error", "Error setting message times");
         }
 
@@ -80,12 +82,14 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
                                 query.addListenerForSingleValueEvent(new ValueEventListener() {
                                     @Override
                                     public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                        for (DataSnapshot messageSnapshot: snapshot.getChildren()) {
+                                        for (DataSnapshot messageSnapshot : snapshot.getChildren()) {
                                             messageSnapshot.getRef().removeValue();
                                         }
                                     }
+
                                     @Override
-                                    public void onCancelled(@NonNull DatabaseError error) {}
+                                    public void onCancelled(@NonNull DatabaseError error) {
+                                    }
                                 });
                                 dialog.cancel();
                             }
@@ -103,6 +107,12 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
         return mChat.size();
     }
 
+    @Override
+    public int getItemViewType(int position) { //return value of 1 (right bubble) if the message sent by the current logged in user and 0 otherwise
+        firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+        return mChat.get(position).getSender().equals(firebaseUser.getUid()) ? MSG_TYPE_RIGHT : MSG_TYPE_LEFT;
+    }
+
     public class ViewHolder extends RecyclerView.ViewHolder {
         public TextView showMessage, messageDate;
         public ImageView friendImage;
@@ -113,11 +123,5 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
             messageDate = itemView.findViewById(R.id.messageDate);
             friendImage = itemView.findViewById(R.id.userImage);
         }
-    }
-
-    @Override
-    public int getItemViewType(int position) { //return value of 1 (right bubble) if the message sent by the current logged in user and 0 otherwise
-        firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-        return mChat.get(position).getSender().equals(firebaseUser.getUid()) ? MSG_TYPE_RIGHT : MSG_TYPE_LEFT;
     }
 }

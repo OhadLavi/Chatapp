@@ -1,10 +1,11 @@
 package com.example.Model;
 
-public class ChatModel {
 //chat POJO includes the data of a chat (sender,receiver,message etc).
+public class ChatModel {
+
     String sender, receiver, message, date, type;
 
-    public ChatModel() { //TODO: delete (?)
+    public ChatModel() {
     }
 
     public ChatModel(String sender, String receiver, String message, String date, String type) {
@@ -21,7 +22,7 @@ public class ChatModel {
 
     public void setSender(String sender) {
         this.sender = sender;
-    } //TODO: delete (?)
+    }
 
     public String getReceiver() {
         return receiver;
@@ -29,9 +30,11 @@ public class ChatModel {
 
     public void setReceiver(String receiver) {
         this.receiver = receiver;
-    } //TODO: delete (?)
+    }
 
-    public String getMessage() { return message; }
+    public String getMessage() {
+        return message;
+    }
 
     public void setMessage(String message) {
         this.message = message;
@@ -41,7 +44,9 @@ public class ChatModel {
         return date;
     }
 
-    public void setDate(String date) { this.date = date; } //TODO: delete (?)
+    public void setDate(String date) {
+        this.date = date;
+    }
 
     public String getType() {
         return type;

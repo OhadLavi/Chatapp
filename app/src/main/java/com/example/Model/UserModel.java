@@ -1,6 +1,5 @@
 package com.example.Model;
 
-import android.widget.ImageView;
 import androidx.annotation.NonNull;
 import androidx.databinding.BindingAdapter;
 import com.squareup.picasso.Picasso;
@@ -12,7 +11,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 public class UserModel {
     String firstName, lastName, image, number, uID, online, status;
 
-    public UserModel() { //TODO: delete (?)
+    public UserModel() {
     }
 
     public UserModel(String firstName, String lastName, String image, String number, String uID, String online, String typing, String status, String token) {
@@ -27,12 +26,6 @@ public class UserModel {
 
     @BindingAdapter("bind:imageUrl")
     public static void loadImage(@NonNull CircleImageView view, @NonNull String image) {
-        //Glide.with(view.getContext()).load(image).into(view); //TODO: delete (?)
-        Picasso.get().load(image).into(view);
-    }
-
-    @BindingAdapter("bind:imageChat") //TODO: delete (?)
-    public static void loadImage(@NonNull ImageView view, @NonNull String image) {
         Picasso.get().load(image).into(view);
     }
 

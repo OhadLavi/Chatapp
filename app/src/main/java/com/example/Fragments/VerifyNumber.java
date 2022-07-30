@@ -17,6 +17,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
@@ -27,6 +28,7 @@ import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
+
 import com.chaos.view.PinView;
 import com.example.Model.UserModel;
 import com.example.Utils;
@@ -65,7 +67,7 @@ public class VerifyNumber extends Fragment {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_verify_number, container, false); //inflate fragment_verify_number.xml
         View view = binding.getRoot();
         otpTextViewPinView = view.findViewById(R.id.otp_text_view);
-        Toolbar toolbar = (Toolbar) view.findViewById(R.id.toolbar); //set toolbar properties
+        Toolbar toolbar = view.findViewById(R.id.toolbar); //set toolbar properties
         toolbar.setTitle("");
         toolbar.setSubtitle("");
         toolbar.setNavigationIcon(getResources().getDrawable(R.drawable.back_arrow));
@@ -78,7 +80,6 @@ public class VerifyNumber extends Fragment {
         if (bundle != null) {
             OTPcode = bundle.getString("VERIFICATION_CODE");
             phoneNumber = bundle.getString("phoneNumber");
-            Toast.makeText(getContext(), OTPcode + phoneNumber, Toast.LENGTH_SHORT).show();
         }
         view.findViewById(R.id.verifyButton).setOnClickListener(view1 -> { //set listener for click on the verify button
             if (checkOTPcode(binding.otpTextView.getText().toString().trim())) { //check if the opt code is valid
@@ -97,6 +98,7 @@ public class VerifyNumber extends Fragment {
             public void onTick(long millisUntilFinished) {
                 countDownTimer.setText(" (" + millisUntilFinished / 1000 + ")");
             }
+
             public void onFinish() {
                 countDownTimer.setText("");
                 resendOTPcode.setTextColor(ContextCompat.getColor(getContext(), R.color.colorPrimary));
@@ -155,7 +157,6 @@ public class VerifyNumber extends Fragment {
     private void checkPermissions(String permission) {
         if (ContextCompat.checkSelfPermission(getContext(), permission) == PackageManager.PERMISSION_GRANTED) {
         } else if (ActivityCompat.shouldShowRequestPermissionRationale(getActivity(), permission)) {
-            //Toast.makeText(getContext(), "Grant SMS permission?", Toast.LENGTH_LONG).show();
         } else {
             requestPermissionLauncher.launch(permission);
         }
@@ -170,7 +171,7 @@ public class VerifyNumber extends Fragment {
             PhoneAuthCredential credential = PhoneAuthProvider.getCredential(OTPcode, code);
             signInWithPhoneAuthCredential(credential);
         } catch (Exception e) {
-            Toast.makeText(getContext(), e.toString(), Toast.LENGTH_SHORT).show();
+            Log.e("Error", e.toString());
         }
     }
 
@@ -195,7 +196,6 @@ public class VerifyNumber extends Fragment {
                         });
                     } else {
                         // Sign in failed, display a message and update the UI
-                        Toast.makeText(getContext(), "" + task.getResult(), Toast.LENGTH_SHORT).show();
                         Log.w("Error", "signInWithCredential: failure", task.getException());
                         if (task.getException() instanceof FirebaseAuthInvalidCredentialsException) {
                             Toast.makeText(getContext(), "Invalid entered OTP code" + task.getException(), Toast.LENGTH_SHORT).show(); // The verification code entered was invalid
@@ -205,7 +205,7 @@ public class VerifyNumber extends Fragment {
     }
 
     public static class SMSbroadcast extends BroadcastReceiver { //BroadcastReceiver for receiving SMS message
-        private String SMS = "android.provider.Telephony.SMS_RECEIVED";
+        private final String SMS = "android.provider.Telephony.SMS_RECEIVED";
 
         @Override
         public void onReceive(Context context, Intent intent) {

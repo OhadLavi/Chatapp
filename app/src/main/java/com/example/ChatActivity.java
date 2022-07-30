@@ -1,24 +1,25 @@
 package com.example;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import com.example.Adapter.ChatAdapter;
-import com.example.Model.ChatListModel;
-import com.example.Model.ChatModel;
-import com.example.project3.R;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.example.Adapter.ChatAdapter;
+import com.example.Model.ChatListModel;
+import com.example.Model.ChatModel;
 import com.example.Model.UserModel;
+import com.example.project3.R;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -28,6 +29,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -47,6 +49,17 @@ public class ChatActivity extends AppCompatActivity {
     private ChatAdapter chatAdapter;
     private List<ChatModel> mChat;
     private Context context;
+    // Interface handler onClick for sending message button
+    private final View.OnClickListener sendButtonHandleClick = new View.OnClickListener() {
+        public void onClick(View view) {
+            String message = messageEditText.getText().toString(); //convert message to string
+            if (!message.equals("")) { //if message not empty
+                sendMessage(message); //send message by calling sendMessage method
+                utils.hideKeyBoard(((AppCompatActivity) context), view); //hide key board
+                messageEditText.setText(""); //initialize the message line to be ready for next message
+            }
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,8 +68,8 @@ public class ChatActivity extends AppCompatActivity {
         context = this;
         if (getSupportActionBar() != null) //hide action bar
             getSupportActionBar().hide();
-        getWindow().setNavigationBarColor(getResources().getColor(R.color.app_background)); //set color fir navigation bar
-        getWindow().setStatusBarColor(getResources().getColor(R.color.chatBackground)); //set color fir status bar
+        getWindow().setNavigationBarColor(getResources().getColor(R.color.app_background)); //set color for navigation bar
+        getWindow().setStatusBarColor(getResources().getColor(R.color.chatBackground)); //set color for status bar
         friendNameTV = findViewById(R.id.freindName); //define friend name (text view)
         friendImage = findViewById(R.id.freindImage); //define friend image  (image view)
         messageEditText = findViewById(R.id.msgText); //define writing message line (edit text)
@@ -72,7 +85,6 @@ public class ChatActivity extends AppCompatActivity {
         Intent intent = getIntent(); //return the intent that started the activity
         findViewById(R.id.msgBack).setOnClickListener(view -> finish()); //listener for back button click, close the current activity and back to the activity that was before it called
 
-        //if (getIntent().getData() != null) //TODO: delete (?)
         userID = intent.getStringExtra("userID"); //get the user id
 
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser(); //get current logged in user
@@ -94,45 +106,28 @@ public class ChatActivity extends AppCompatActivity {
                     friendNameTV.setText(friendNameString); //set name to be shown in the text view
                     if (!friendModel.getImage().equals(""))
                         Picasso.get().load(friendModel.getImage()).into(friendImage); //load friend's image
-
                     findViewById(R.id.callFriend).setOnClickListener(view1 -> startActivity(new Intent(Intent.ACTION_DIAL,
                             Uri.parse("tel:" + friendModel.getNumber())))); //define listener for the dial button that will take user to dial screen and set the number to be the friend number
-
                     if (intent.hasExtra("chatID") && intent.getStringExtra("chatID") != null) {
                         chatID = intent.getStringExtra("chatID");
                         readMessages(chatID);
-                    } else {
+                    } else
                         checkChat(friendID);
-                    }
                 }
                 //checkChat(friendID); //call checkChat method that find the chat of current logged in user and his friend and load the message history from it //TODO: delete (?)
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-
             }
         });
     }
 
-    // Interface handler onClick for sending message button
-    private View.OnClickListener sendButtonHandleClick = new View.OnClickListener(){
-        public void onClick(View view) {
-            String message = messageEditText.getText().toString(); //convert message to string
-            if (!message.equals("")) { //if message not empty
-                sendMessage(message); //send message by calling sendMessage method
-                utils.hideKeyBoard(((AppCompatActivity)context), view); //hide key board
-                messageEditText.setText(""); //initialize the message line to be ready for next message
-            }
-        }
-    };
-
     private void sendMessage(String message) { //method for sending new message
-        if (chatID == null) {
+        if (chatID == null)
             createChat(message);
-        }
         else {
-            date =  utils.currentDate(); //get the date of today
+            date = utils.currentDate(); //get the date of today
             ChatModel messageModel = new ChatModel(myID, friendID, message, date, ""); //create new instance of a message according the ChatModel and initialize the fields: sender, receiver, message, date, type
             databaseReference = FirebaseDatabase.getInstance().getReference("Chat").child(chatID); //get reference to fire base specific chat according its id
             databaseReference.push().setValue(messageModel); //add the new message to the fire base specific chat
@@ -141,13 +136,12 @@ public class ChatActivity extends AppCompatActivity {
             update.put("lastMessage", message);
             update.put("date", date);
             update.put("chatListID", chatID);
-            update.put("member", friendID);
             //update in fire base both current user chat history and friend chat history with the last message
             databaseReference = FirebaseDatabase.getInstance().getReference("ChatList").child(myID).child(chatID);
             databaseReference.updateChildren(update);
             databaseReference = FirebaseDatabase.getInstance().getReference("ChatList").child(friendID).child(chatID);
             databaseReference.updateChildren(update);
-       }
+        }
     }
 
     private void readMessages(String chatID) { //method for read messages
@@ -159,7 +153,7 @@ public class ChatActivity extends AppCompatActivity {
                 mChat.clear(); //initialize the array list
                 for (DataSnapshot dataSnapshot : snapshot.getChildren()) { //for each message in the chat
                     ChatModel chatModel = dataSnapshot.getValue(ChatModel.class);
-                    if(chatModel != null && (chatModel.getReceiver().equals(myID) && chatModel.getSender().equals(friendID) ||
+                    if (chatModel != null && (chatModel.getReceiver().equals(myID) && chatModel.getSender().equals(friendID) ||
                             chatModel.getReceiver().equals(friendID) && chatModel.getSender().equals(myID))) { //check that the message is registered both for the current logged in user and its friend
                         mChat.add(chatModel); //add the message to the array list
                     }
@@ -167,8 +161,10 @@ public class ChatActivity extends AppCompatActivity {
                     recyclerView.setAdapter(chatAdapter); //set the recycle view adapter
                 }
             }
+
             @Override
-            public void onCancelled(@NonNull DatabaseError error) { }
+            public void onCancelled(@NonNull DatabaseError error) {
+            }
         });
     }
 
@@ -189,8 +185,10 @@ public class ChatActivity extends AppCompatActivity {
                     }
                 }
             }
+
             @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) { }
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+            }
         });
     }
 
@@ -198,21 +196,15 @@ public class ChatActivity extends AppCompatActivity {
         databaseReference = FirebaseDatabase.getInstance().getReference("ChatList").child(myID);
         chatID = databaseReference.push().getKey();
         ChatListModel chatListModel = new ChatListModel(chatID, utils.currentDate(), msg, friendID);
-        databaseReference.child(chatID).setValue(chatListModel, new DatabaseReference.CompletionListener() {
-            @Override
-            public void onComplete(@Nullable DatabaseError error, @NonNull DatabaseReference ref) {
-                ChatListModel chatList = new ChatListModel(chatID, utils.currentDate(), msg, myID);
-                databaseReference = FirebaseDatabase.getInstance().getReference("ChatList").child(friendID);
-                databaseReference.child(chatID).setValue(chatList, new DatabaseReference.CompletionListener() {
-                    @Override
-                    public void onComplete(@Nullable DatabaseError error, @NonNull DatabaseReference ref) {
-                        ChatModel messageModel = new ChatModel(myID, friendID, msg, utils.currentDate(), "text");
-                        databaseReference = FirebaseDatabase.getInstance().getReference("Chat").child(chatID);
-                        databaseReference.push().setValue(messageModel);
-                    }
-                });
-            }
-        });
+        databaseReference.child(chatID).setValue(chatListModel);
+
+        databaseReference = FirebaseDatabase.getInstance().getReference("ChatList").child(friendID);
+        ChatListModel chatList = new ChatListModel(chatID, utils.currentDate(), msg, myID);
+        databaseReference.child(chatID).setValue(chatList);
+
+        databaseReference = FirebaseDatabase.getInstance().getReference("Chat").child(chatID);
+        ChatModel messageModel = new ChatModel(myID, friendID, msg, utils.currentDate(), "text");
+        databaseReference.push().setValue(messageModel);
     }
 
     @Override

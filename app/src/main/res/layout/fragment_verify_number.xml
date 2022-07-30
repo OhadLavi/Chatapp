@@ -24,7 +24,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:gravity="center"
-            android:text="Didn't receive the code?"
+            android:text="@string/didn_t_receive_the_codeRegister"
             android:textColor="@color/primary_text"
             android:textSize="14sp"
             app:layout_constraintEnd_toEndOf="parent"
@@ -51,7 +51,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
-            android:text="Verification"
+            android:text="@string/verificationRegister"
             android:textColor="@color/white"
             android:textFontWeight="500"
             android:textSize="30sp"
@@ -67,14 +67,14 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="15dp"
             android:gravity="center"
-            android:text="Enter your OTP code number"
+            android:text="@string/verificationTextRegister"
             android:textColor="@color/primary_text"
             android:textSize="14sp"
             app:layout_constraintBottom_toTopOf="@+id/linearLayout"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
 
-        <LinearLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/linearLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -97,56 +97,62 @@
                 android:visibility="gone"
                 app:SpinKit_Color="@color/white" />
 
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/phoneNumLayout"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent" />
-
-            <com.chaos.view.PinView
-                android:id="@+id/otp_text_view"
-                style="@style/PinWidget.PinView"
+            <LinearLayout
+                android:id="@+id/linearLayout2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/text"
-                android:layout_centerHorizontal="true"
-                android:layout_gravity="center"
-                android:layout_marginStart="5dp"
-                android:layout_marginEnd="5dp"
-                android:layout_marginBottom="5dp"
-                android:cursorVisible="true"
-                android:hint=""
-                android:inputType="number"
-                android:itemBackground="@color/white"
-                android:padding="5dp"
-                android:textColor="@color/primary_dark"
-                android:textColorHighlight="#61b7ff"
-                android:textColorHint="@color/white"
-                android:textSize="20sp"
-                android:textStyle="bold"
-                app:cursorColor="@color/white"
-                app:cursorWidth="2dp"
-                app:hideLineWhenFilled="true"
-                app:itemCount="6"
-                app:itemHeight="55dp"
-                app:itemRadius="10dp"
-                app:itemSpacing="4dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="20dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                tools:layout_editor_absoluteY="10dp">
 
-                app:lineColor="@color/pinViewLine"
-                app:lineWidth="2dp"
-                app:viewType="rectangle" />
+                <com.chaos.view.PinView
+                    android:id="@+id/otp_text_view"
+                    style="@style/PinWidget.PinView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:layout_gravity="center"
+                    android:layout_marginBottom="5dp"
+                    android:cursorVisible="true"
+                    android:hint=""
+                    android:inputType="number"
+                    android:itemBackground="@color/white"
+                    android:padding="5dp"
+                    android:textColor="@color/primary_dark"
+                    android:textColorHighlight="#61b7ff"
+                    android:textColorHint="@color/white"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    app:cursorColor="@color/white"
+                    app:cursorWidth="2dp"
+                    app:hideLineWhenFilled="true"
+                    app:itemCount="6"
+                    app:itemHeight="55dp"
+                    app:itemRadius="10dp"
+                    app:itemSpacing="7dp"
+                    app:itemWidth="52dp"
+                    app:lineColor="@color/pinViewLine"
+                    app:lineWidth="2dp"
+                    app:viewType="rectangle" />
+            </LinearLayout>
 
             <Button
                 android:id="@+id/verifyButton"
+                android:layout_marginTop="5dp"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginTop="10dp"
+                android:layout_height="wrap_content"
                 android:background="@drawable/registration_button"
-                android:text="Verify"
+                android:text="@string/verifyRegister"
                 android:textAllCaps="false"
                 android:textColor="@color/white"
-                android:textSize="18sp" />
+                android:textSize="18sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/linearLayout2" />
 
-        </LinearLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -160,7 +166,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
-                android:text="Resend new code"
+                android:text="@string/resend_new_codeRegister"
                 android:textColor="@color/primary_text"
                 android:textSize="18sp" />
 
@@ -170,12 +176,15 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="2dp"
                 android:layout_marginTop="4dp"
-                android:text="(Timer)"
+                android:text="@string/timerRegister"
                 android:textColor="@color/white"
                 android:textSize="10sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/textView3" />
+
+
+
         </LinearLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

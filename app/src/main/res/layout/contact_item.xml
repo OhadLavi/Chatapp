@@ -38,7 +38,7 @@
                     android:layout_alignParentTop="true"
                     android:layout_marginStart="75dp"
                     android:layout_marginTop="10dp"
-                    android:text='test'
+                    android:text="@string/contactName"
                     android:textColor="@color/white"
                     android:textSize="15dp"
                     android:textStyle="bold" />
@@ -64,7 +64,7 @@
                     android:layout_marginTop="10dp"
                     android:layout_marginRight="7dp"
                     android:gravity="right"
-                    android:text="test"
+                    android:text="@string/contactLastMessage"
                     android:textColor="@color/chatDate"
                     android:textSize="13dp"
                     android:textStyle="bold" />

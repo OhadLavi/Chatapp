@@ -31,7 +31,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:text="Add image"
+                    android:text="@string/add_imageRegister"
                     android:textColor="@color/white"
                     android:textFontWeight="600"
                     android:textSize="18sp" />
@@ -74,7 +74,7 @@
                     android:layout_height="43dp"
                     android:layout_marginTop="30dp"
                     android:background="@drawable/login_input_style"
-                    android:hint="First Name"
+                    android:hint="@string/first_nameRegister"
                     android:inputType="text|textCapSentences"
                     android:padding="10dp"
                     android:textColor="@color/primary_text"
@@ -87,7 +87,7 @@
                     android:layout_height="43dp"
                     android:layout_marginTop="30dp"
                     android:background="@drawable/login_input_style"
-                    android:hint="Last Name"
+                    android:hint="@string/last_nameRegister"
                     android:inputType="text|textCapSentences"
                     android:padding="10dp"
                     android:textColor="@color/primary_text"
@@ -100,7 +100,7 @@
                     android:layout_height="43dp"
                     android:layout_marginTop="30dp"
                     android:background="@drawable/login_input_style"
-                    android:hint="Status"
+                    android:hint="@string/statusRegister"
                     android:windowSoftInputMode="stateHidden"
                     android:inputType="text"
                     android:padding="10dp"
@@ -118,18 +118,11 @@
             android:layout_marginHorizontal="20dp"
             android:layout_marginTop="30dp"
             android:background="@drawable/registration_button"
-            android:text="Done"
+            android:text="@string/doneRegister"
             android:textAllCaps="false"
             android:textColor="@color/white"
             android:textSize="20dp"
             android:textStyle="bold" />
 
-        <com.google.android.material.progressindicator.LinearProgressIndicator
-            android:id="@+id/progressIndicator"
-            android:layout_below="@id/btnDataDone"
-            android:layout_marginTop="20dp"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:indeterminate="true" />
     </RelativeLayout>
 </layout>

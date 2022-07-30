@@ -8,6 +8,12 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.EditText;
+import android.widget.Toast;
+
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
@@ -16,11 +22,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.EditText;
-import android.widget.Toast;
+
 import com.example.MainActivity;
 import com.example.Utils;
 import com.example.project3.R;
@@ -32,19 +34,13 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
 public class UserData extends Fragment {
-    private FragmentUserDataBinding binding;
-    private String firstName, lastName, status, storagePath;
-    private FirebaseAuth firebaseAuth;
-    private DatabaseReference databaseReference;
-    private StorageReference storageReference;
-    private Uri imageUri;
-    private SharedPreferences sharedPreferences;
-    private Utils utils;
+    public static final int PICK_IMAGE = 1;
     private final ActivityResultLauncher<String> requestPermissionLauncher =
             registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
                 if (isGranted) {
@@ -53,6 +49,14 @@ public class UserData extends Fragment {
                     Toast.makeText(getActivity(), "You must grant storage permission", Toast.LENGTH_LONG).show();
                 }
             });
+    private FragmentUserDataBinding binding;
+    private String firstName, lastName, status, storagePath;
+    private FirebaseAuth firebaseAuth;
+    private DatabaseReference databaseReference;
+    private StorageReference storageReference;
+    private Uri imageUri;
+    private SharedPreferences sharedPreferences;
+    private Utils utils;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -62,10 +66,10 @@ public class UserData extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        binding = DataBindingUtil.inflate(inflater,R.layout.fragment_user_data, container, false); //inflate fragment_user_data.xml
+        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_user_data, container, false); //inflate fragment_user_data.xml
         View view = binding.getRoot();
         utils = new Utils();
-        Toolbar toolbar = (Toolbar) view.findViewById(R.id.toolbar); //set toolbar properties
+        Toolbar toolbar = view.findViewById(R.id.toolbar); //set toolbar properties
         toolbar.setNavigationIcon(getResources().getDrawable(R.drawable.back_arrow));
         firebaseAuth = FirebaseAuth.getInstance(); //receive an instance to fire base
         databaseReference = FirebaseDatabase.getInstance().getReference("Users"); //get reference to users in fire base
@@ -75,7 +79,7 @@ public class UserData extends Fragment {
         binding.imagePicker.setOnClickListener(new View.OnClickListener() { //listener for click on the image picker widget
             @Override
             public void onClick(View view) {
-                if(utils.isStorageOk(getContext())) // If permission to read data from external storage allowed
+                if (utils.isStorageOk(getContext())) // If permission to read data from external storage allowed
                     pickImage();
                 else { // Request permission
                     String permission = Manifest.permission.READ_EXTERNAL_STORAGE;
@@ -119,7 +123,6 @@ public class UserData extends Fragment {
         } else return true;
     }
 
-    public static final int PICK_IMAGE = 1;
     private void pickImage() { //create new implicit intent to get image from user
         Intent intent = new Intent();
         intent.setType("image/*");
@@ -139,7 +142,6 @@ public class UserData extends Fragment {
 
     private void uploadData() { //method to upload data to fire base
         Toast.makeText(getContext(), "Uploading", Toast.LENGTH_SHORT).show();
-        getView().findViewById(R.id.progressIndicator).setVisibility(View.VISIBLE);
         storageReference.child(storagePath).putFile(imageUri).addOnSuccessListener(taskSnapshot -> { //upload user image to fire base and receive URL to access it
             Task<Uri> task = taskSnapshot.getStorage().getDownloadUrl();
             task.addOnCompleteListener(new OnCompleteListener<Uri>() { //listener for image URL received successfully

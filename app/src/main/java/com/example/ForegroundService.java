@@ -13,6 +13,7 @@ import android.os.IBinder;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
+
 import com.example.project3.R;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -25,10 +26,10 @@ public class ForegroundService extends Service {
 
     public static final String CHANNEL_ID_1 = "NotificationChannel";
     private FirebaseAuth auth;
-    private Notification notification1; //TODO: delete notification1
+    private Notification notification1;
     private Context context;
     private long numberOfUsers;
-    private boolean flag = true;
+    private boolean isFirst = true;
 
     @Override
     public void onCreate() {
@@ -39,6 +40,7 @@ public class ForegroundService extends Service {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 numberOfUsers = snapshot.getChildrenCount();
             }
+
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
             }
@@ -76,9 +78,14 @@ public class ForegroundService extends Service {
             }
         });
 
+        if (isFirst) {
+            isFirst = false;
+            startForeground(1, notification1);
+        }
+
         // Called from notification's receiver
-        if (intent != null && intent.getAction() != null && intent.getAction().equals("STOP_ACTION"))
-            startForeground(1, notification1); //Clicking on the notification will restarts the service with "STOP_ACTION"
+        //if (intent != null && intent.getAction() != null && intent.getAction().equals("STOP_ACTION"))
+        //    startForeground(1, notification1); //Clicking on the notification will restarts the service with "STOP_ACTION"
         return START_STICKY;
     }
 

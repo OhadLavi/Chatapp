@@ -1,8 +1,7 @@
 package com.example.Model;
 
+// Chat list POJO includes the data of a chat (Chat's id, last message and its date and to whom).
 public class ChatListModel {
-
-    // Chat list POJO includes the data of a chat (Chat's id, last message and its date and to whom).
     String chatListID, date, lastMessage, member;
 
     public ChatListModel() { //TODO: delete (?)
@@ -14,7 +13,7 @@ public class ChatListModel {
         this.lastMessage = lastMessage;
         this.member = member;
     }
-    //TODO: delete (?)
+
     public String getChatListID() {
         return chatListID;
     }

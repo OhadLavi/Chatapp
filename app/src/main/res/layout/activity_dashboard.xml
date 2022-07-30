@@ -39,7 +39,7 @@
                     android:background="@drawable/search_input"
                     app:iconifiedByDefault="false"
                     app:queryBackground="@android:color/transparent"
-                    app:queryHint="Search friend"
+                    app:queryHint="@string/searchHint"
                     app:searchHintIcon="@drawable/search_button"
                     app:searchIcon="@drawable/search_button" />
 

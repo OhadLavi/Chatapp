@@ -7,27 +7,30 @@ import androidx.lifecycle.ViewModel;
 public class ChatsViewModel extends ViewModel {
 
     private final MutableLiveData<Integer> itemSelected; //position observer
-    private MutableLiveData <Integer> itemsCount; //number of contacts observer
+    private final MutableLiveData<Integer> itemsCount; //number of contacts observer
 
     public ChatsViewModel() {
         itemSelected = new MutableLiveData<Integer>(-1);
-        itemsCount = new MutableLiveData <Integer>(0);
+        itemsCount = new MutableLiveData<Integer>(0);
         init();
     }
 
-    public void init() { }
+    public void init() {
+    }
 
     public MutableLiveData<Integer> getItemSelected() {
         return itemSelected;
-    } //TODO: delete (?)
+    }
 
     public void setPosition(Integer item) {
         itemSelected.setValue(item);
     }
 
-    public LiveData<Integer> getSelected() { return itemSelected; }
+    public LiveData<Integer> getSelected() {
+        return itemSelected;
+    }
 
-    public MutableLiveData <Integer> getItemsCount () {
+    public MutableLiveData<Integer> getItemsCount() {
         return itemsCount;
     }
 

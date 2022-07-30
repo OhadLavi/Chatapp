@@ -19,6 +19,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
@@ -45,6 +46,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.squareup.picasso.Picasso;
+
 import java.util.Map;
 import java.util.Objects;
 
@@ -149,8 +151,10 @@ public class Profile extends Fragment {
                                                 }
                                             }
                                         }
+
                                         @Override
-                                        public void onCancelled(@NonNull DatabaseError error) { }
+                                        public void onCancelled(@NonNull DatabaseError error) {
+                                        }
                                     });
                                 } catch (Exception e) {
                                     Log.e("Error", e.toString());
@@ -309,45 +313,48 @@ public class Profile extends Fragment {
     }
 
     private void getUserDetail(String uID) {
-        final DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Users").child(uID); //reference to user's information in fire base
-        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if (dataSnapshot.exists()) { //get the information from fire base and update the widgets with it
-                    user = dataSnapshot.getValue(UserModel.class);
-                    profileName.setText(user.getFirstName() + " " + user.getLastName());
-                    profileFirstNameEditText.setText(user.getFirstName());
-                    profileLastNameEditText.setText(user.getLastName());
-                    profilePhoneNumber.setText(user.getNumber());
-                    profileStatusEditText.setText(user.getStatus());
-                    if (!myProfile) {
-                        String lastSeen = null;
-                        try {
-                            lastSeen = Utils.getTimeAgo(Long.parseLong(user.getOnline()));
-                        } catch (Exception e) {
-                            Log.e("Error", e.getMessage().toString());
-                        }
-                        profileLastSeen.setText(lastSeen == null ? "Online" : "Last seen " + lastSeen);
-                        if (!user.getImage().equals("")) {
-                            Picasso.get().load(user.getImage()).fit().into(profileImage);
-                            Picasso.get().load(user.getImage()).into(imgProfile);
-                        }
-                    } else {
-                        profileLastSeen.setText(profilePhoneNumber.getText().toString());
-                        String d = null;
-                        if (!sharedPreferences.getString("userImage", d).equals("")) {
-                            Picasso.get().load(sharedPreferences.getString("userImage", d)).into(imgProfile);
-                            Picasso.get().load(sharedPreferences.getString("userImage", d)).fit().into(profileImage);
-                        }
-                        else {
-                            Picasso.get().load(user.getImage()).fit().into(profileImage);
-                            Picasso.get().load(user.getImage()).into(imgProfile);
+        if (uID != null) {
+            final DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Users").child(uID); //reference to user's information in fire base
+            databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    if (dataSnapshot.exists()) { //get the information from fire base and update the widgets with it
+                        user = dataSnapshot.getValue(UserModel.class);
+                        profileName.setText(user.getFirstName() + " " + user.getLastName());
+                        profileFirstNameEditText.setText(user.getFirstName());
+                        profileLastNameEditText.setText(user.getLastName());
+                        profilePhoneNumber.setText(user.getNumber());
+                        profileStatusEditText.setText(user.getStatus());
+                        if (!myProfile) {
+                            String lastSeen = null;
+                            try {
+                                lastSeen = Utils.getTimeAgo(Long.parseLong(user.getOnline()));
+                            } catch (Exception e) {
+                                Log.e("Error", e.getMessage());
+                            }
+                            profileLastSeen.setText(lastSeen == null ? "Online" : "Last seen " + lastSeen);
+                            if (!user.getImage().equals("")) {
+                                Picasso.get().load(user.getImage()).fit().into(profileImage);
+                                Picasso.get().load(user.getImage()).into(imgProfile);
+                            }
+                        } else {
+                            profileLastSeen.setText(profilePhoneNumber.getText().toString());
+                            String d = null;
+                            if (!sharedPreferences.getString("userImage", d).equals("")) {
+                                Picasso.get().load(sharedPreferences.getString("userImage", d)).into(imgProfile);
+                                Picasso.get().load(sharedPreferences.getString("userImage", d)).fit().into(profileImage);
+                            } else {
+                                Picasso.get().load(user.getImage()).fit().into(profileImage);
+                                Picasso.get().load(user.getImage()).into(imgProfile);
+                            }
                         }
                     }
                 }
-            }
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) { }
-        });
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+                }
+            });
+        }
     }
 }
