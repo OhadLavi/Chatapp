@@ -2,14 +2,16 @@ package com.example.Adapter;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.view.ContextThemeWrapper;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.Model.ChatModel;
 import com.example.Utils;
@@ -22,7 +24,6 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -56,20 +57,19 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
     public void onBindViewHolder(@NonNull ChatAdapter.ViewHolder holder, int position) { //set timestamp to last message sent
         ChatModel chat = mChat.get(position);
         holder.showMessage.setText(chat.getMessage());
-        DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH-mm-ss", Locale.FRENCH);
         Date date = null;
         try {
             date = (Date) Utils.sdf().parse(chat.getDate());
             SimpleDateFormat sdf = new SimpleDateFormat("HH:mm", Locale.FRENCH);
             holder.messageDate.setText(sdf.format(date));
         } catch(Exception e) {
-            Toast.makeText(context, "Error setting message times", Toast.LENGTH_SHORT).show();
+            Log.e("Error", "Error setting message times");
         }
 
         holder.itemView.setOnLongClickListener(new View.OnLongClickListener() { //long click listener for delete message
             @Override
             public boolean onLongClick(View view) { //ask user if he want to delete the clicked message and remove it form fire base (or cancel the process)
-                AlertDialog.Builder builder1 = new AlertDialog.Builder(context);
+                AlertDialog.Builder builder1 = new AlertDialog.Builder(new ContextThemeWrapper(context, R.style.AlertDialogCustom));
                 builder1.setMessage("Do you want to delete this message?");
                 builder1.setCancelable(true);
                 builder1.setPositiveButton("Yes",
@@ -104,7 +104,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
-        public TextView showMessage, messageDate, onlineStatus;
+        public TextView showMessage, messageDate;
         public ImageView friendImage;
 
         public ViewHolder(@NonNull View itemView) {

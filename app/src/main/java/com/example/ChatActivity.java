@@ -1,6 +1,7 @@
 package com.example;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -9,7 +10,6 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import com.example.Adapter.ChatAdapter;
-import com.example.Adapter.UserAdapter;
 import com.example.Model.ChatListModel;
 import com.example.Model.ChatModel;
 import com.example.project3.R;
@@ -18,7 +18,6 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 import com.example.Model.UserModel;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -99,13 +98,6 @@ public class ChatActivity extends AppCompatActivity {
                     findViewById(R.id.callFriend).setOnClickListener(view1 -> startActivity(new Intent(Intent.ACTION_DIAL,
                             Uri.parse("tel:" + friendModel.getNumber())))); //define listener for the dial button that will take user to dial screen and set the number to be the friend number
 
-                    findViewById(R.id.toolbar).setOnClickListener(new View.OnClickListener() { //listener for click on the toolbar while in chat with friend
-                        @Override
-                        public void onClick(View view) { //create profile fragment on the friend with its all details and show it on screen (using createChatFragment method in the UserAdapter)
-                            UserAdapter userAdapter = new UserAdapter(context, friendModel);
-                            userAdapter.createChatFragment(friendModel, R.id.chatContainer);
-                        }
-                    });
                     if (intent.hasExtra("chatID") && intent.getStringExtra("chatID") != null) {
                         chatID = intent.getStringExtra("chatID");
                         readMessages(chatID);
@@ -144,12 +136,12 @@ public class ChatActivity extends AppCompatActivity {
             ChatModel messageModel = new ChatModel(myID, friendID, message, date, ""); //create new instance of a message according the ChatModel and initialize the fields: sender, receiver, message, date, type
             databaseReference = FirebaseDatabase.getInstance().getReference("Chat").child(chatID); //get reference to fire base specific chat according its id
             databaseReference.push().setValue(messageModel); //add the new message to the fire base specific chat
-
             //crate new map object with the last message sent and its date
             Map<String, Object> update = new HashMap<>();
             update.put("lastMessage", message);
             update.put("date", date);
-            Toast.makeText(context, date, Toast.LENGTH_SHORT).show(); //TODO: delete
+            update.put("chatListID", chatID);
+            update.put("member", friendID);
             //update in fire base both current user chat history and friend chat history with the last message
             databaseReference = FirebaseDatabase.getInstance().getReference("ChatList").child(myID).child(chatID);
             databaseReference.updateChildren(update);
@@ -206,14 +198,21 @@ public class ChatActivity extends AppCompatActivity {
         databaseReference = FirebaseDatabase.getInstance().getReference("ChatList").child(myID);
         chatID = databaseReference.push().getKey();
         ChatListModel chatListModel = new ChatListModel(chatID, utils.currentDate(), msg, friendID);
-        databaseReference.child(chatID).setValue(chatListModel);
-        databaseReference = FirebaseDatabase.getInstance().getReference("ChatList").child(friendID);
-        ChatListModel chatList = new ChatListModel(chatID, utils.currentDate(), msg, myID);
-        databaseReference.child(chatID).setValue(chatList);
-
-        databaseReference = FirebaseDatabase.getInstance().getReference("Chat").child(chatID);
-        ChatModel messageModel = new ChatModel(myID, friendID, msg, utils.currentDate(), "text");
-        databaseReference.push().setValue(messageModel);
+        databaseReference.child(chatID).setValue(chatListModel, new DatabaseReference.CompletionListener() {
+            @Override
+            public void onComplete(@Nullable DatabaseError error, @NonNull DatabaseReference ref) {
+                ChatListModel chatList = new ChatListModel(chatID, utils.currentDate(), msg, myID);
+                databaseReference = FirebaseDatabase.getInstance().getReference("ChatList").child(friendID);
+                databaseReference.child(chatID).setValue(chatList, new DatabaseReference.CompletionListener() {
+                    @Override
+                    public void onComplete(@Nullable DatabaseError error, @NonNull DatabaseReference ref) {
+                        ChatModel messageModel = new ChatModel(myID, friendID, msg, utils.currentDate(), "text");
+                        databaseReference = FirebaseDatabase.getInstance().getReference("Chat").child(chatID);
+                        databaseReference.push().setValue(messageModel);
+                    }
+                });
+            }
+        });
     }
 
     @Override

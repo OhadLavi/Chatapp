@@ -54,7 +54,8 @@
             android:text="Verification"
             android:textColor="@color/white"
             android:textFontWeight="500"
-            android:textSize="25sp"
+            android:textSize="30sp"
+            android:textStyle="bold"
             app:layout_constraintBottom_toTopOf="@+id/textView2"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -109,6 +110,8 @@
                 android:layout_below="@id/text"
                 android:layout_centerHorizontal="true"
                 android:layout_gravity="center"
+                android:layout_marginStart="5dp"
+                android:layout_marginEnd="5dp"
                 android:layout_marginBottom="5dp"
                 android:cursorVisible="true"
                 android:hint=""
@@ -127,7 +130,7 @@
                 app:itemHeight="55dp"
                 app:itemRadius="10dp"
                 app:itemSpacing="4dp"
-                app:itemWidth="55dp"
+
                 app:lineColor="@color/pinViewLine"
                 app:lineWidth="2dp"
                 app:viewType="rectangle" />
@@ -140,6 +143,7 @@
                 android:background="@drawable/registration_button"
                 android:text="Verify"
                 android:textAllCaps="false"
+                android:textColor="@color/white"
                 android:textSize="18sp" />
 
         </LinearLayout>

@@ -14,6 +14,7 @@ public class NotificationServiceHandler extends AppCompatActivity {
         onReceive();
     }
 
+    //On message received set stop action to the foreground, and load the Main Activity on press
     private void onReceive() {
         Intent activityIntent = new Intent(this, MainActivity.class);
         this.startActivity(activityIntent);

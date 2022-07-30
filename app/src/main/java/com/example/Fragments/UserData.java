@@ -50,7 +50,7 @@ public class UserData extends Fragment {
                 if (isGranted) {
                     pickImage();
                 } else {
-                    Toast.makeText(getActivity(), "You must grant SMS permission", Toast.LENGTH_LONG).show(); //TODO: change text to gallery view permission(?)
+                    Toast.makeText(getActivity(), "You must grant storage permission", Toast.LENGTH_LONG).show();
                 }
             });
 
@@ -67,28 +67,24 @@ public class UserData extends Fragment {
         utils = new Utils();
         Toolbar toolbar = (Toolbar) view.findViewById(R.id.toolbar); //set toolbar properties
         toolbar.setNavigationIcon(getResources().getDrawable(R.drawable.back_arrow));
-        //((AppCompatActivity)getActivity()).setSupportActionBar(toolbar); //TODO: delete (?)
-        //((AppCompatActivity)getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        //toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-        //    @Override
-        //    public void onClick(View v) {
-        //        getActivity().getSupportFragmentManager().popBackStack();
-        //    }
-        //});
-
         firebaseAuth = FirebaseAuth.getInstance(); //receive an instance to fire base
         databaseReference = FirebaseDatabase.getInstance().getReference("Users"); //get reference to users in fire base
         storageReference = FirebaseStorage.getInstance().getReference();
         storagePath = firebaseAuth.getUid() + "Media/Profile_Image/profile"; //get user profile image path
         sharedPreferences = getContext().getSharedPreferences("UserData", Context.MODE_PRIVATE); //for accessing and modifying preference data
-
         binding.imagePicker.setOnClickListener(new View.OnClickListener() { //listener for click on the image picker widget
             @Override
             public void onClick(View view) {
-                if(utils.isStorageOk(getContext()))
+                if(utils.isStorageOk(getContext())) // If permission to read data from external storage allowed
                     pickImage();
-                else
-                    checkPermissions(Manifest.permission.READ_EXTERNAL_STORAGE);
+                else { // Request permission
+                    String permission = Manifest.permission.READ_EXTERNAL_STORAGE;
+                    if (ContextCompat.checkSelfPermission(getContext(), permission) == PackageManager.PERMISSION_GRANTED) {
+                    } else if (ActivityCompat.shouldShowRequestPermissionRationale(getActivity(), permission))
+                        Toast.makeText(getActivity(), "You must grant storage permission", Toast.LENGTH_LONG).show();
+                    else
+                        requestPermissionLauncher.launch(permission);
+                }
             }
         });
 
@@ -100,18 +96,10 @@ public class UserData extends Fragment {
                 status = binding.status.getText().toString(); //get status
                 if (checkTextFields(binding.firstName) && checkTextFields(binding.lastName) &&
                         checkTextFields(binding.status) && checkImage()) //check if data is valid
-                    uploadData(); //upload to fire base
+                    uploadData(); //upload to firebase
             }
         });
         return view;
-    }
-
-    private void checkPermissions(String permission) {
-        if (ContextCompat.checkSelfPermission(getContext(), permission) == PackageManager.PERMISSION_GRANTED) {
-        } else if (ActivityCompat.shouldShowRequestPermissionRationale(getActivity(), permission))
-            Toast.makeText(getActivity(), "You must grant SMS permission", Toast.LENGTH_LONG).show();
-          else
-            requestPermissionLauncher.launch(permission);
     }
 
     private boolean checkTextFields(EditText e) { //return true if text field isn't empty
@@ -151,6 +139,7 @@ public class UserData extends Fragment {
 
     private void uploadData() { //method to upload data to fire base
         Toast.makeText(getContext(), "Uploading", Toast.LENGTH_SHORT).show();
+        getView().findViewById(R.id.progressIndicator).setVisibility(View.VISIBLE);
         storageReference.child(storagePath).putFile(imageUri).addOnSuccessListener(taskSnapshot -> { //upload user image to fire base and receive URL to access it
             Task<Uri> task = taskSnapshot.getStorage().getDownloadUrl();
             task.addOnCompleteListener(new OnCompleteListener<Uri>() { //listener for image URL received successfully

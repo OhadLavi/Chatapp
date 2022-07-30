@@ -24,6 +24,7 @@ import com.example.Adapter.UserAdapter;
 import com.example.Fragments.Profile;
 import com.example.Model.ChatListModel;
 import com.example.Model.UserModel;
+import com.example.ViewModel.ChatsViewModel;
 import com.example.project3.R;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -48,7 +49,6 @@ public class Dashboard extends AppCompatActivity implements SearchView.OnQueryTe
 
     @Override
     public void onBackPressed() { //methode to deal with back button press
-        //Toast.makeText(this, "test", Toast.LENGTH_SHORT).show(); //TODO: delete
         if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
             getSupportFragmentManager().popBackStack();
             chatsViewModel.getItemsCount().observe(this, itemsNum -> { getSupportActionBar().setTitle("Messages (" + String.valueOf(itemsNum)+ ")"); });
@@ -95,17 +95,17 @@ public class Dashboard extends AppCompatActivity implements SearchView.OnQueryTe
                 mUsers.clear(); //initialize the list of the users
                 for(DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     UserModel user = snapshot.getValue(UserModel.class); //save user data from FireBase in a pattern of UserModel POJO
-                    if (user.getuID() != null) {
-                        if (!user.getuID().equals(firebaseUser.getUid())) //if the user id is different then current connected user
-                            mUsers.add(user); //add user to the list
-                        else
-                            myID = user.getuID(); //else set myID string value
-                        userAdapter = new UserAdapter(Dashboard.this, mUsers, chatsViewModel); //define adapter for the recycle view
-                        recyclerView.setAdapter(userAdapter); //set adapter for recycle view
-                        chatsViewModel.getSelected().observe((LifecycleOwner) context, item -> { //update the userAdapter about change in date and refresh the view
-                            userAdapter.notifyDataSetChanged();
-                        });
-                    }
+                    if (firebaseUser != null && user != null && user.getuID() != null && !user.getFirstName().equals("")) { // Check if user completed the registration
+                            if (!user.getuID().equals(firebaseUser.getUid())) //if the user id is different then current connected user
+                                mUsers.add(user); //add user to the list
+                            else
+                                myID = user.getuID(); //else set myID string value
+                            userAdapter = new UserAdapter(Dashboard.this, mUsers, chatsViewModel); //define adapter for the recycle view
+                            recyclerView.setAdapter(userAdapter); //set adapter for recycle view
+                            chatsViewModel.getSelected().observe((LifecycleOwner) context, item -> { //update the userAdapter about change in date and refresh the view
+                                userAdapter.notifyDataSetChanged();
+                            });
+                        }
                 }
             }
             @Override
@@ -169,5 +169,4 @@ public class Dashboard extends AppCompatActivity implements SearchView.OnQueryTe
             userAdapter.getFilter().filter(newText);
         return false;
     }
-
 }

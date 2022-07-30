@@ -49,9 +49,6 @@ public class GetNumber extends Fragment {
                     binding.spinKit.setVisibility(View.VISIBLE);
                     sendOTPcode(phoneNumber);
                 }
-                else {
-
-                }
             }
         });
 
@@ -70,7 +67,7 @@ public class GetNumber extends Fragment {
         view.findViewById(R.id.phoneNum).setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View view, boolean hasFocus) {
-                //if(!hasFocus) utils.hideKeyBoard(getActivity()); //TODO: delete (?)
+                if(!hasFocus) utils.hideKeyBoard(getActivity(), view);
             }
         });
         return view;

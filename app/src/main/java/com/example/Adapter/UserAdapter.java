@@ -16,7 +16,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.ChatActivity;
-import com.example.ChatsViewModel;
+import com.example.ViewModel.ChatsViewModel;
 import com.example.Fragments.Profile;
 import com.example.Model.UserModel;
 import com.example.project3.R;
@@ -83,14 +83,6 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> im
         filterArrayList.addAll(mUsers);
     }
 
-    public UserAdapter(Context context, UserModel mUsers) {
-        this.context = context;
-        this.mUsers = new ArrayList<>();
-        this.mUsers.add(mUsers);
-        filterArrayList = new ArrayList<>();
-        this.filterArrayList.add(mUsers);
-    }
-
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) { //inflate a contact row for recycle view
@@ -101,13 +93,10 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> im
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         UserModel users = mUsers.get(position); //get user from mUsers list
-        //chatsViewModel.setItemsCount(3); //TODO: delete (?)
         chatsViewModel.setItemsCount(mUsers.size()); //set the current number of registered users
-        //notifyDataSetChanged(); //TODO: delete (?)
         String username = users.getFirstName() + " " + users.getLastName(); //create string with first and last name
         holder.userName.setText(username); //set name to the row widget
         getLastMessage(users, holder); //call method getLastMessage
-        //holder.status.setText(lastMsg == null ? ("Status: " + users.getStatus()) : lastMsg); //TODO: delete (?)
         if (!users.getImage().equals("")) //load user image to row widget
             Picasso.get().load(users.getImage()).into(holder.userImage);
         holder.itemView.setOnClickListener(new View.OnClickListener() { //listener for click on a contact row
@@ -119,12 +108,12 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> im
                 context.startActivity(i);
             }
         });
-        holder.itemView.setOnLongClickListener(new View.OnLongClickListener() { //set long click listener for clicking contact row TODO: delete (?)
+        holder.itemView.setOnLongClickListener(new View.OnLongClickListener() { //set long click listener for clicking contact row to show user's profile
             @Override
             public boolean onLongClick(View view) { //open contact profile
                 chatsViewModel.setPosition(selectedPos);
                 if(selectedPos == holder.getAbsoluteAdapterPosition())
-                    createChatFragment(users, R.id.dashboardContainer);
+                    createProfileFragment(users, R.id.dashboardContainer);
                 if(selectedPos > holder.getAbsoluteAdapterPosition())
                     selectedPos -= 1;
                 chatsViewModel.setPosition(selectedPos);
@@ -133,15 +122,10 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> im
                 return false;
             }
         });
-        holder.userImage.setOnClickListener(new View.OnClickListener() { //TODO: delete (?)
-            @Override
-            public void onClick(View view) {
-                createChatFragment(users, R.id.dashboardContainer);
-            }
-        });
+        holder.userImage.setOnClickListener(view -> createProfileFragment(users, R.id.dashboardContainer)); // On image click show the user's profile
     }
 
-    public void createChatFragment(UserModel users, int container) { //create and load fragment with contact profile
+    public void createProfileFragment(UserModel users, int container) { //create and load fragment with contact profile
         Fragment fragment;
         FragmentManager fragmentManager;
         fragment = new Profile();

@@ -38,8 +38,6 @@ public class Utils {
         Date date = calendar.getTime();
         sdf().setTimeZone(TimeZone.getTimeZone("Asia/Jerusalem"));
         return sdf().format(date);
-        //return sdf().format(calendar.getTimeInMillis()); //TODO: delete (?)
-        //calendar.setTimeZone(TimeZone.getTimeZone(timezone));
     }
 
     public static SimpleDateFormat sdf() {
@@ -87,13 +85,7 @@ public class Utils {
         return ContextCompat.checkSelfPermission(context, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
     }
 
-    public void requestStorage(Activity activity) { //request user permission to read data from external storage TODO: delete (?)
-        ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE}, 2000);
-    }
-
     public void updateOnlineStatus(String online) {
-        //if (!online.equals("online")) TODO: delete (?)
-        //    online = getTimeAgo(online);
         DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Users").child(FirebaseAuth.getInstance().getCurrentUser().getUid());
         HashMap<String, Object> map = new HashMap<>();
         map.put("online", online);

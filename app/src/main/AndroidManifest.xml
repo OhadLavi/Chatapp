@@ -31,6 +31,7 @@
         <receiver android:name="com.example.Fragments.VerifyNumber$SMSbroadcast"  android:exported="true">
             <intent-filter android:priority="100">
                 <action android:name="android.provider.Telephony.SMS_RECEIVED"/>
+                <action android:name="android.provider.Telephony.READ_SMS"/>
             </intent-filter>
         </receiver>
         <activity

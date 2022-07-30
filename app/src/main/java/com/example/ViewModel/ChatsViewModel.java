@@ -1,10 +1,10 @@
-package com.example;
+package com.example.ViewModel;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-public class ChatsViewModel extends ViewModel { //TODO: move class to Model directory
+public class ChatsViewModel extends ViewModel {
 
     private final MutableLiveData<Integer> itemSelected; //position observer
     private MutableLiveData <Integer> itemsCount; //number of contacts observer

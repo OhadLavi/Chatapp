@@ -88,7 +88,6 @@
                     android:id="@+id/phoneNum"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/login_input_style"
                     android:hint="Phone Number"
                     android:inputType="number" />
             </com.google.android.material.textfield.TextInputLayout>
@@ -99,6 +98,7 @@
                 android:layout_height="match_parent"
                 android:background="@drawable/registration_button"
                 android:text="Send OTP"
+                android:textColor="@color/white"
                 android:textAllCaps="false"
                 android:textSize="18sp" />
 
